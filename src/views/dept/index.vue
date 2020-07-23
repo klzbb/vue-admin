@@ -1,32 +1,41 @@
 <template>
   <div class="dept">
-    <el-tree
-      :data="tree"
-      show-checkbox
-      node-key="id"
-      :default-checked-keys="[]"
-      :props="defaultProps"
-    >
-      <span slot-scope="{ node, data }" class="custom-tree-node">
-        <span>{{ node.label }}</span>
-        <span>
-          <el-button
-            type="text"
-            size="mini"
-            @click.stop="edit(data)"
-          >
-            编辑
-          </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="del(data)"
-          >
-            删除
-          </el-button>
+    <div class="dept_dept">
+      <div class="dept_dept_label">
+        <span>部门列表</span>
+        <i class="el-icon-circle-plus-outline" @click="addDept" />
+      </div>
+      <el-tree
+        :data="tree"
+        show-checkbox
+        node-key="id"
+        :default-checked-keys="[]"
+        :props="defaultProps"
+      >
+        <span slot-scope="{ node, data }" class="custom-tree-node">
+          <span>{{ node.label }}</span>
+          <span>
+            <el-button
+              type="text"
+              size="mini"
+              @click.stop="edit(data)"
+            >
+              编辑
+            </el-button>
+            <el-button
+              type="text"
+              size="mini"
+              @click="del(data)"
+            >
+              删除
+            </el-button>
+          </span>
         </span>
-      </span>
-    </el-tree>
+      </el-tree>
+    </div>
+    <div class="dept_user">
+      kkk
+    </div>
   </div>
 </template>
 <script>
@@ -84,6 +93,12 @@ export default {
     this.init()
   },
   methods: {
+    addDept() {
+
+    },
+    del(item) {
+
+    },
     edit(item) {
       debugger
     },
@@ -99,3 +114,25 @@ export default {
   }
 }
 </script>
+<style lang="scss">
+.dept{
+  padding:15px;
+  position: relative;
+  &_dept{
+    width: 200px;
+    &_label{
+      background-color: #409eff;
+      color: #fff;
+      height: 40px;
+      line-height: 40px;
+      padding:0 5px;
+    }
+  }
+  &_user{
+    width: 100%;
+    position: absolute;
+    top: 15px;
+    left: 215px;
+  }
+}
+</style>
