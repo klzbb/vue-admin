@@ -11,3 +11,6 @@ import axios from '@/utils/request.js'
 // 部门树
 export const deptTree = params => axios.post('/dept/tree', params)
 
+// 添加部门
+export const deptAdd = params => axios.post('/dept/add', params)
+

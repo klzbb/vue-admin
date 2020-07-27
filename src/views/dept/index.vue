@@ -38,7 +38,7 @@
           <el-cascader
             v-model="value"
             :clearable="true"
-            :options="tree"
+            :options="deptList"
             :props="cascaderProps"
             placeholder="请选择上级部门"
             @change="handleChange"
@@ -56,17 +56,18 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+        <el-button type="primary" @click="sure">确 定</el-button>
       </div>
     </el-dialog>
   </div>
 </template>
 <script>
-import { deptTree } from '@/api/index.js'
+import { deptTree, deptAdd } from '@/api/index.js'
 export default {
   name: 'Dept',
   data() {
     return {
+      deptList: [],
       value: [],
       options: [
         {
@@ -344,14 +345,15 @@ export default {
       dialogTableVisible: false,
       dialogFormVisible: false,
       form: {
-        parentId: '',
+        parentId: 0,
         name: '',
         seq: '',
         remark: ''
       },
       formLabelWidth: '120px',
       cascaderProps: {
-        // expandTrigger: "hover",
+        value: 'id',
+        expandTrigger: 'hover',
         children: 'deptList',
         label: 'name'
       }
@@ -361,9 +363,17 @@ export default {
     this.init()
   },
   methods: {
-    handleChange() {
-
+    async sure() {
+      const len = this.value.length - 1
+      console.log(this.value)
+      this.form.parentId = this.value[len]
+      console.log(this.form)
+      const res = await deptAdd(this.form)
+      if (res && res.data.code === 0) {
+        alert('kkk')
+      }
     },
+    handleChange(value) {},
     addDept() {
       this.dialogFormVisible = true
     },
@@ -376,13 +386,21 @@ export default {
         .then(res => {})
         .catch(e => {})
     },
+
     async deptTree() {
       const res = await deptTree()
       if (res && res.data.code === 0) {
         const tree = res.data.data
         this.tree = this.getTreeData(tree)
-        this.tree.unshift({ name: '无', parentId: 0 })
+        this.deptList = this.formMatch(tree)
+        // this.deptList.unshift({name:"无",parentId:0})
+        // console.log(this.deptList);
       }
+    },
+    formMatch(list) {
+      const arr = [{ name: '无', parentId: 0 }]
+      const result = arr.concat(list)
+      return result
     },
     // 递归判断列表，把最后的children设为undefined
     getTreeData(data) {
