@@ -28,3 +28,9 @@ export const deptUpdate = (params) => axios({
   data: params
 })
 
+// 注册用户
+export const register = (params) => axios({
+  url: 'register',
+  method: 'post',
+  data: params
+})
