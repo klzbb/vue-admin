@@ -4,7 +4,7 @@
  * @Author: Author
  * @Date: 2020-07-21 14:10:12
  * @LastEditors: konglingzhan
- * @LastEditTime: 2020-07-21 17:49:29
+ * @LastEditTime: 2020-07-28 15:51:33
  */
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
@@ -74,7 +74,6 @@ service.interceptors.response.use(
       //     })
       //   })
       // }
-      return Promise.reject(new Error(res.message || 'Error'))
     } else {
       return res
     }
