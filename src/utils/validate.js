@@ -1,3 +1,11 @@
+/*
+ * @Descripttion: DOP
+ * @version: 1.0.0
+ * @Author: Author
+ * @Date: 2020-07-27 17:29:06
+ * @LastEditors: konglingzhan
+ * @LastEditTime: 2020-08-10 15:23:10
+ */
 /**
  * Created by PanJiaChen on 16/11/18.
  */
@@ -15,7 +23,7 @@ export function isExternal(path) {
  * @returns {Boolean}
  */
 export function validUsername(str) {
-  const valid_map = ['admin', 'editor']
+  const valid_map = ['admin', 'editor', 'user']
   return valid_map.indexOf(str.trim()) >= 0
 }
 

@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" autocomplete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">登录</h3>
       </div>
 
       <el-form-item prop="username">
@@ -18,6 +18,7 @@
           type="text"
           tabindex="1"
           autocomplete="on"
+          clearable
         />
       </el-form-item>
 
@@ -35,6 +36,7 @@
             name="password"
             tabindex="2"
             autocomplete="on"
+            clearable
             @keyup.native="checkCapslock"
             @blur="capsTooltip = false"
             @keyup.enter.native="handleLogin"
@@ -45,7 +47,7 @@
         </el-form-item>
       </el-tooltip>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
       <el-button type="success" style="width:100%;margin-bottom:30px;margin-left:0;" @click.native.prevent="home">跳转首页</el-button>
     </el-form>
 
@@ -62,7 +64,7 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import SocialSign from './components/SocialSignin'
-
+import { login } from '@/api/index.js'
 export default {
   name: 'Login',
   components: { SocialSign },
@@ -145,14 +147,14 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm)
-            .then(() => {
+          login(this.loginForm).then(res => {
+            if (res && res.data.code === 0) {
               this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
               this.loading = false
-            })
-            .catch(() => {
-              this.loading = false
-            })
+            }
+          }).catch(e => {
+            this.loading = false
+          })
         } else {
           console.log('error submit!!')
           return false

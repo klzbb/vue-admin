@@ -4,7 +4,7 @@
  * @Author: Author
  * @Date: 2020-07-21 16:35:03
  * @LastEditors: konglingzhan
- * @LastEditTime: 2020-07-28 15:19:19
+ * @LastEditTime: 2020-08-10 15:56:13
  */
 import axios from '@/utils/request.js'
 
@@ -33,4 +33,21 @@ export const register = (params) => axios({
   url: 'register',
   method: 'post',
   data: params
+})
+
+/* 把对象转化为formData表单格式 */
+const formUtil = (obj) => {
+  const formData = new FormData()
+  if (Object.keys(obj).length === 0) { return formData }
+  for (const key in obj) {
+    formData.append(key, obj[key])
+  }
+  return formData
+}
+
+// 登录
+export const login = params => axios({
+  url: '/login',
+  method: 'post',
+  data: formUtil(params)
 })
