@@ -4,7 +4,7 @@
  * @Author: Author
  * @Date: 2020-07-21 14:10:12
  * @LastEditors: konglingzhan
- * @LastEditTime: 2020-07-28 15:51:33
+ * @LastEditTime: 2020-08-12 13:45:52
  */
 import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
@@ -15,7 +15,7 @@ import { getToken } from '@/utils/auth'
 const service = axios.create({
   baseURL: process.env.VUE_APP_SERVICE_URL, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 20000 // request timeout
 })
 
 // request interceptor

@@ -4,7 +4,7 @@
  * @Author: Author
  * @Date: 2020-07-21 16:35:03
  * @LastEditors: konglingzhan
- * @LastEditTime: 2020-08-10 15:56:13
+ * @LastEditTime: 2020-08-12 16:08:16
  */
 import axios from '@/utils/request.js'
 
@@ -33,6 +33,20 @@ export const register = (params) => axios({
   url: 'register',
   method: 'post',
   data: params
+})
+
+// 用户列表
+export const userList = (params) => axios({
+  url: '/user/list',
+  method: 'post',
+  data: formUtil(params)
+})
+
+// 用户删除
+export const delUserById = (params) => axios({
+  url: '/user/delById',
+  method: 'post',
+  data: formUtil(params)
 })
 
 /* 把对象转化为formData表单格式 */

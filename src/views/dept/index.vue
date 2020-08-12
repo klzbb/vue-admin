@@ -11,6 +11,7 @@
         node-key="id"
         :default-checked-keys="[]"
         :props="defaultProps"
+        @node-click="nodeClick"
       >
         <span slot-scope="{ node, data }" class="dept_dept_tree_item">
           <span>{{ node.label }}</span>
@@ -26,13 +27,33 @@
         <span class="label">用户列表</span>
         <i class="el-icon-circle-plus-outline" @click="userAdd" />
       </div>
+      <div class="dept_user_">
+        <el-table :data="userList" style="width: 100%">
+          <el-table-column prop="username" label="姓名" width="180" />
+
+          <el-table-column prop="dept_id" label="所属部门" width="180" />
+
+          <el-table-column prop="mail" label="邮箱" width="180" />
+          <el-table-column prop="telephone" label="电话" width="180" />
+          <el-table-column prop="status" label="状态" width="180" />
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button type="text" size="small" @click="userEdit(scope.row)">编辑</el-button>
+              <el-button type="text" size="small" @click="userDel(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+        <el-pagination
+          :current-page.sync="pageNo"
+          :page-size="100"
+          layout="total, prev, pager, next"
+          :total="total"
+          @size-change="handleSizeChange"
+          @current-change="handleCurrentChange"
+        />
+      </div>
     </div>
-    <el-dialog
-      width="800px"
-      :modal-append-to-body="false"
-      :title="title"
-      :visible.sync="dialogFormVisible"
-    >
+    <el-dialog width="800px" :modal-append-to-body="false" :title="title" :visible.sync="dialogFormVisible">
       <el-form ref="elForm" :model="form">
         <el-form-item prop="value" label="上级部门" :label-width="formLabelWidth">
           <el-cascader
@@ -60,12 +81,7 @@
       </div>
     </el-dialog>
 
-    <el-dialog
-      width="800px"
-      :modal-append-to-body="false"
-      :title="userTitle"
-      :visible.sync="userVisible"
-    >
+    <el-dialog width="800px" :modal-append-to-body="false" :title="userTitle" :visible.sync="userVisible">
       <el-form ref="userForm" :model="userForm">
         <el-form-item prop="value" label="上级部门" :label-width="formLabelWidth">
           <el-cascader
@@ -79,6 +95,9 @@
         </el-form-item>
         <el-form-item prop="username" label="用户名" :label-width="formLabelWidth">
           <el-input v-model="userForm.username" placeholder="用户名" clearable autocomplete="off" />
+        </el-form-item>
+        <el-form-item prop="password" label="密码" :label-width="formLabelWidth">
+          <el-input v-model="userForm.password" placeholder="密码" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="telephone" label="电话号码" :label-width="formLabelWidth">
           <el-input v-model="userForm.telephone" placeholder="电话号码" clearable autocomplete="off" />
@@ -110,18 +129,26 @@ import {
   deptAdd,
   deptDel,
   deptUpdate,
-  register
+  register,
+  userList,
+  delUserById
 } from '@/api/index.js'
 export default {
   name: 'Dept',
   data() {
     return {
+      deptId: '',
+      pageNo: 1,
+      pageSize: 10,
+      userList: [],
+      total: 0,
       userTitle: '添加用户',
       userVisible: false,
       userDeptList: [],
       userForm: {
         username: '',
         telephone: '',
+        password: '',
         mail: '',
         status: '',
         remark: '',
@@ -132,273 +159,261 @@ export default {
       currentDept: {},
       deptList: [],
       value: [],
-      options: [
-        {
-          value: 'zhinan',
-          label: '指南',
-          children: [
-            {
-              value: 'shejiyuanze',
-              label: '设计原则',
-              children: [
-                {
-                  value: 'yizhi',
-                  label: '一致'
-                },
-                {
-                  value: 'fankui',
-                  label: '反馈'
-                },
-                {
-                  value: 'xiaolv',
-                  label: '效率'
-                },
-                {
-                  value: 'kekong',
-                  label: '可控'
-                }
-              ]
-            },
-            {
-              value: 'daohang',
-              label: '导航',
-              children: [
-                {
-                  value: 'cexiangdaohang',
-                  label: '侧向导航'
-                },
-                {
-                  value: 'dingbudaohang',
-                  label: '顶部导航'
-                }
-              ]
-            }
+      options: [{
+        value: 'zhinan',
+        label: '指南',
+        children: [{
+          value: 'shejiyuanze',
+          label: '设计原则',
+          children: [{
+            value: 'yizhi',
+            label: '一致'
+          },
+          {
+            value: 'fankui',
+            label: '反馈'
+          },
+          {
+            value: 'xiaolv',
+            label: '效率'
+          },
+          {
+            value: 'kekong',
+            label: '可控'
+          }
           ]
         },
         {
-          value: 'zujian',
-          label: '组件',
-          children: [
-            {
-              value: 'basic',
-              label: 'Basic',
-              children: [
-                {
-                  value: 'layout',
-                  label: 'Layout 布局'
-                },
-                {
-                  value: 'color',
-                  label: 'Color 色彩'
-                },
-                {
-                  value: 'typography',
-                  label: 'Typography 字体'
-                },
-                {
-                  value: 'icon',
-                  label: 'Icon 图标'
-                },
-                {
-                  value: 'button',
-                  label: 'Button 按钮'
-                }
-              ]
-            },
-            {
-              value: 'form',
-              label: 'Form',
-              children: [
-                {
-                  value: 'radio',
-                  label: 'Radio 单选框'
-                },
-                {
-                  value: 'checkbox',
-                  label: 'Checkbox 多选框'
-                },
-                {
-                  value: 'input',
-                  label: 'Input 输入框'
-                },
-                {
-                  value: 'input-number',
-                  label: 'InputNumber 计数器'
-                },
-                {
-                  value: 'select',
-                  label: 'Select 选择器'
-                },
-                {
-                  value: 'cascader',
-                  label: 'Cascader 级联选择器'
-                },
-                {
-                  value: 'switch',
-                  label: 'Switch 开关'
-                },
-                {
-                  value: 'slider',
-                  label: 'Slider 滑块'
-                },
-                {
-                  value: 'time-picker',
-                  label: 'TimePicker 时间选择器'
-                },
-                {
-                  value: 'date-picker',
-                  label: 'DatePicker 日期选择器'
-                },
-                {
-                  value: 'datetime-picker',
-                  label: 'DateTimePicker 日期时间选择器'
-                },
-                {
-                  value: 'upload',
-                  label: 'Upload 上传'
-                },
-                {
-                  value: 'rate',
-                  label: 'Rate 评分'
-                },
-                {
-                  value: 'form',
-                  label: 'Form 表单'
-                }
-              ]
-            },
-            {
-              value: 'data',
-              label: 'Data',
-              children: [
-                {
-                  value: 'table',
-                  label: 'Table 表格'
-                },
-                {
-                  value: 'tag',
-                  label: 'Tag 标签'
-                },
-                {
-                  value: 'progress',
-                  label: 'Progress 进度条'
-                },
-                {
-                  value: 'tree',
-                  label: 'Tree 树形控件'
-                },
-                {
-                  value: 'pagination',
-                  label: 'Pagination 分页'
-                },
-                {
-                  value: 'badge',
-                  label: 'Badge 标记'
-                }
-              ]
-            },
-            {
-              value: 'notice',
-              label: 'Notice',
-              children: [
-                {
-                  value: 'alert',
-                  label: 'Alert 警告'
-                },
-                {
-                  value: 'loading',
-                  label: 'Loading 加载'
-                },
-                {
-                  value: 'message',
-                  label: 'Message 消息提示'
-                },
-                {
-                  value: 'message-box',
-                  label: 'MessageBox 弹框'
-                },
-                {
-                  value: 'notification',
-                  label: 'Notification 通知'
-                }
-              ]
-            },
-            {
-              value: 'navigation',
-              label: 'Navigation',
-              children: [
-                {
-                  value: 'menu',
-                  label: 'NavMenu 导航菜单'
-                },
-                {
-                  value: 'tabs',
-                  label: 'Tabs 标签页'
-                },
-                {
-                  value: 'breadcrumb',
-                  label: 'Breadcrumb 面包屑'
-                },
-                {
-                  value: 'dropdown',
-                  label: 'Dropdown 下拉菜单'
-                },
-                {
-                  value: 'steps',
-                  label: 'Steps 步骤条'
-                }
-              ]
-            },
-            {
-              value: 'others',
-              label: 'Others',
-              children: [
-                {
-                  value: 'dialog',
-                  label: 'Dialog 对话框'
-                },
-                {
-                  value: 'tooltip',
-                  label: 'Tooltip 文字提示'
-                },
-                {
-                  value: 'popover',
-                  label: 'Popover 弹出框'
-                },
-                {
-                  value: 'card',
-                  label: 'Card 卡片'
-                },
-                {
-                  value: 'carousel',
-                  label: 'Carousel 走马灯'
-                },
-                {
-                  value: 'collapse',
-                  label: 'Collapse 折叠面板'
-                }
-              ]
-            }
-          ]
-        },
-        {
-          value: 'ziyuan',
-          label: '资源',
-          children: [
-            {
-              value: 'axure',
-              label: 'Axure Components'
-            },
-            {
-              value: 'sketch',
-              label: 'Sketch Templates'
-            },
-            {
-              value: 'jiaohu',
-              label: '组件交互文档'
-            }
+          value: 'daohang',
+          label: '导航',
+          children: [{
+            value: 'cexiangdaohang',
+            label: '侧向导航'
+          },
+          {
+            value: 'dingbudaohang',
+            label: '顶部导航'
+          }
           ]
         }
+        ]
+      },
+      {
+        value: 'zujian',
+        label: '组件',
+        children: [{
+          value: 'basic',
+          label: 'Basic',
+          children: [{
+            value: 'layout',
+            label: 'Layout 布局'
+          },
+          {
+            value: 'color',
+            label: 'Color 色彩'
+          },
+          {
+            value: 'typography',
+            label: 'Typography 字体'
+          },
+          {
+            value: 'icon',
+            label: 'Icon 图标'
+          },
+          {
+            value: 'button',
+            label: 'Button 按钮'
+          }
+          ]
+        },
+        {
+          value: 'form',
+          label: 'Form',
+          children: [{
+            value: 'radio',
+            label: 'Radio 单选框'
+          },
+          {
+            value: 'checkbox',
+            label: 'Checkbox 多选框'
+          },
+          {
+            value: 'input',
+            label: 'Input 输入框'
+          },
+          {
+            value: 'input-number',
+            label: 'InputNumber 计数器'
+          },
+          {
+            value: 'select',
+            label: 'Select 选择器'
+          },
+          {
+            value: 'cascader',
+            label: 'Cascader 级联选择器'
+          },
+          {
+            value: 'switch',
+            label: 'Switch 开关'
+          },
+          {
+            value: 'slider',
+            label: 'Slider 滑块'
+          },
+          {
+            value: 'time-picker',
+            label: 'TimePicker 时间选择器'
+          },
+          {
+            value: 'date-picker',
+            label: 'DatePicker 日期选择器'
+          },
+          {
+            value: 'datetime-picker',
+            label: 'DateTimePicker 日期时间选择器'
+          },
+          {
+            value: 'upload',
+            label: 'Upload 上传'
+          },
+          {
+            value: 'rate',
+            label: 'Rate 评分'
+          },
+          {
+            value: 'form',
+            label: 'Form 表单'
+          }
+          ]
+        },
+        {
+          value: 'data',
+          label: 'Data',
+          children: [{
+            value: 'table',
+            label: 'Table 表格'
+          },
+          {
+            value: 'tag',
+            label: 'Tag 标签'
+          },
+          {
+            value: 'progress',
+            label: 'Progress 进度条'
+          },
+          {
+            value: 'tree',
+            label: 'Tree 树形控件'
+          },
+          {
+            value: 'pagination',
+            label: 'Pagination 分页'
+          },
+          {
+            value: 'badge',
+            label: 'Badge 标记'
+          }
+          ]
+        },
+        {
+          value: 'notice',
+          label: 'Notice',
+          children: [{
+            value: 'alert',
+            label: 'Alert 警告'
+          },
+          {
+            value: 'loading',
+            label: 'Loading 加载'
+          },
+          {
+            value: 'message',
+            label: 'Message 消息提示'
+          },
+          {
+            value: 'message-box',
+            label: 'MessageBox 弹框'
+          },
+          {
+            value: 'notification',
+            label: 'Notification 通知'
+          }
+          ]
+        },
+        {
+          value: 'navigation',
+          label: 'Navigation',
+          children: [{
+            value: 'menu',
+            label: 'NavMenu 导航菜单'
+          },
+          {
+            value: 'tabs',
+            label: 'Tabs 标签页'
+          },
+          {
+            value: 'breadcrumb',
+            label: 'Breadcrumb 面包屑'
+          },
+          {
+            value: 'dropdown',
+            label: 'Dropdown 下拉菜单'
+          },
+          {
+            value: 'steps',
+            label: 'Steps 步骤条'
+          }
+          ]
+        },
+        {
+          value: 'others',
+          label: 'Others',
+          children: [{
+            value: 'dialog',
+            label: 'Dialog 对话框'
+          },
+          {
+            value: 'tooltip',
+            label: 'Tooltip 文字提示'
+          },
+          {
+            value: 'popover',
+            label: 'Popover 弹出框'
+          },
+          {
+            value: 'card',
+            label: 'Card 卡片'
+          },
+          {
+            value: 'carousel',
+            label: 'Carousel 走马灯'
+          },
+          {
+            value: 'collapse',
+            label: 'Collapse 折叠面板'
+          }
+          ]
+        }
+        ]
+      },
+      {
+        value: 'ziyuan',
+        label: '资源',
+        children: [{
+          value: 'axure',
+          label: 'Axure Components'
+        },
+        {
+          value: 'sketch',
+          label: 'Sketch Templates'
+        },
+        {
+          value: 'jiaohu',
+          label: '组件交互文档'
+        }
+        ]
+      }
       ],
       tree: [],
       defaultProps: {
@@ -428,6 +443,59 @@ export default {
     this.init()
   },
   methods: {
+    handleSizeChange(val) {
+      console.log(`每页 ${val} 条`)
+    },
+    handleCurrentChange(val) {
+      console.log(`当前页: ${val}`)
+    },
+    userDel(row) {
+      const {
+        id
+      } = row
+      this.$confirm('用户删除后将不可恢复，是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async() => {
+          const res = await delUserById({
+            id
+          })
+          if (res && res.data.code === 0) {
+            this.$message.success('删除成功')
+            this.selectUserListByDeptId(this.deptId)
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    },
+    userEdit(row) {
+
+    },
+    nodeClick(data) {
+      const {
+        id: deptId
+      } = data
+      this.deptId = deptId
+      this.selectUserListByDeptId(deptId)
+    },
+    async selectUserListByDeptId(deptId) {
+      const params = {
+        deptId,
+        pageNo: this.pageNo,
+        pageSize: this.pageSize
+      }
+      const res = await userList(params)
+      if (res && res.data.code === 0) {
+        this.userList = res.data.data.data
+        this.total = res.data.data.total
+      }
+    },
     userAdd() {
       this.userForm = {}
       this.userDeptList = []
@@ -438,11 +506,29 @@ export default {
       console.log(this.value)
       const len = this.userDeptList.length - 1
       this.userForm.deptId = this.userDeptList[len]
-      const { username, telephone, mail, status, remark, deptId } = this.userForm
+      const {
+        username,
+        telephone,
+        password,
+        mail,
+        status,
+        remark,
+        deptId
+      } = this.userForm
 
-      const res = await register({ username, telephone, mail, status, remark, deptId })
+      const res = await register({
+        username,
+        telephone,
+        password,
+        mail,
+        status,
+        remark,
+        deptId
+      })
       if (res && res.data.code === 0) {
-        alert('kkkk')
+        this.userVisible = false
+        this.$message.success('用户注册成功')
+        if (this.deptId) this.selectUserListByDeptId(this.deptId)
       }
     },
     async sure() {
@@ -450,8 +536,18 @@ export default {
         console.log(this.value)
         const len = this.value.length - 1
         this.form.parent_id = this.value[len]
-        const { parent_id: parentId, name, seq, remark } = this.form
-        const res = await deptAdd({ parentId, name, seq, remark })
+        const {
+          parent_id: parentId,
+          name,
+          seq,
+          remark
+        } = this.form
+        const res = await deptAdd({
+          parentId,
+          name,
+          seq,
+          remark
+        })
         if (res && res.data.code === 0) {
           this.form = {}
           this.dialogFormVisible = false
@@ -459,8 +555,20 @@ export default {
           this.init()
         }
       } else if (this.type === '1') {
-        const { parent_id: parentId, name, seq, remark, id } = this.form
-        const updateRes = await deptUpdate({ parentId, name, seq, remark, id })
+        const {
+          parent_id: parentId,
+          name,
+          seq,
+          remark,
+          id
+        } = this.form
+        const updateRes = await deptUpdate({
+          parentId,
+          name,
+          seq,
+          remark,
+          id
+        })
         if (updateRes && updateRes.data.code === 0) {
           this.form = {}
           this.dialogFormVisible = false
@@ -500,7 +608,9 @@ export default {
     edit(item) {
       this.type = '1'
       this.title = '编辑部门'
-      this.form = { ...item }
+      this.form = {
+        ...item
+      }
       console.log(this.form)
       this.value = this.formatToValue(item)
       this.dialogFormVisible = true
@@ -536,12 +646,10 @@ export default {
       }
     },
     formMatch(list) {
-      const arr = [
-        {
-          name: '无',
-          id: 0
-        }
-      ]
+      const arr = [{
+        name: '无',
+        id: 0
+      }]
       const result = arr.concat(list)
       return result
     },
@@ -560,65 +668,68 @@ export default {
     }
   }
 }
+
 </script>
 <style lang="scss">
-.dept {
-  padding: 15px;
-  position: relative;
+  .dept {
+    padding: 15px;
+    position: relative;
 
-  &_dept {
-    width: 350px;
+    &_dept {
+      width: 350px;
 
-    &_label {
-      background-color: #409eff;
-      color: #fff;
-      height: 40px;
-      line-height: 40px;
-      padding: 0 5px;
-      margin-bottom: 10px;
+      &_label {
+        background-color: #409eff;
+        color: #fff;
+        height: 40px;
+        line-height: 40px;
+        padding: 0 5px;
+        margin-bottom: 10px;
 
-      .label {
-        margin-right: 20px;
+        .label {
+          margin-right: 20px;
+        }
+      }
+
+      &_tree_item {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 14px;
+        padding-right: 8px;
       }
     }
 
-    &_tree_item {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 14px;
-      padding-right: 8px;
-    }
-  }
+    &_user {
+      width: 100%;
+      position: absolute;
+      top: 15px;
+      left: 365px;
+      padding-left: 30px;
 
-  &_user {
-    width: 100%;
-    position: absolute;
-    top: 15px;
-    left: 365px;
-    padding-left: 30px;
+      &_label {
+        background-color: #409eff;
+        color: #fff;
+        height: 40px;
+        line-height: 40px;
+        padding: 0 5px;
+        margin-bottom: 10px;
 
-    &_label {
-      background-color: #409eff;
-      color: #fff;
-      height: 40px;
-      line-height: 40px;
-      padding: 0 5px;
-      margin-bottom: 10px;
-
-      .label {
-        margin-right: 20px;
+        .label {
+          margin-right: 20px;
+        }
       }
     }
+
+    // reset element-ui css
+    .el-cascader {
+      display: block;
+    }
+
+    .el-select {
+      display: block;
+    }
   }
 
-  // reset element-ui css
-  .el-cascader {
-    display: block;
-  }
-  .el-select {
-    display: block;
-  }
-}
 </style>
