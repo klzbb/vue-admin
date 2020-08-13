@@ -9,42 +9,42 @@
 import axios from '@/utils/request.js'
 
 // 部门树
-export const deptTree = params => axios.post('/dept/tree', params)
+export const deptTree = params => axios.post('/app/dept/tree', params)
 
 // 添加部门
-export const deptAdd = params => axios.post('/dept/add', params)
+export const deptAdd = params => axios.post('/app/dept/add', params)
 
 // 删除部门
 export const deptDel = params => axios({
   method: 'post',
-  url: '/dept/delById',
+  url: '/app/dept/delById',
   params
 })
 
 // 更新部门
 export const deptUpdate = (params) => axios({
-  url: '/dept/update',
+  url: '/app/dept/update',
   method: 'post',
   data: params
 })
 
 // 注册用户
 export const register = (params) => axios({
-  url: 'register',
+  url: '/app/register',
   method: 'post',
-  data: params
+  data: formUtil(params)
 })
 
 // 用户列表
 export const userList = (params) => axios({
-  url: '/user/list',
+  url: '/app/user/list',
   method: 'post',
   data: formUtil(params)
 })
 
 // 用户删除
 export const delUserById = (params) => axios({
-  url: '/user/delById',
+  url: '/app/user/delById',
   method: 'post',
   data: formUtil(params)
 })
@@ -61,7 +61,7 @@ const formUtil = (obj) => {
 
 // 登录
 export const login = params => axios({
-  url: '/login',
+  url: '/app/user/login',
   method: 'post',
   data: formUtil(params)
 })

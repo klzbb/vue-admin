@@ -70,11 +70,12 @@ export default {
   components: { SocialSign },
   data() {
     const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
+      // if (!validUsername(value)) {
+      //   callback(new Error('Please enter the correct user name'))
+      // } else {
+      //   callback()
+      // }
+      callback()
     }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
@@ -85,8 +86,8 @@ export default {
     }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        username: '13622894595',
+        password: '123444'
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -148,9 +149,10 @@ export default {
         if (valid) {
           this.loading = true
           login(this.loginForm).then(res => {
+            this.loading = false
             if (res && res.data.code === 0) {
-              this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
-              this.loading = false
+              this.$router.push({ name: 'Dept' })
+              // this.$router.push({ path: this.redirect || '/', query: this.otherQuery })
             }
           }).catch(e => {
             this.loading = false
