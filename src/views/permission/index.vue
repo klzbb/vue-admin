@@ -2,7 +2,7 @@
   <div class="dept">
     <div class="dept_dept">
       <div class="dept_dept_label">
-        <span class="label">部门列表</span>
+        <span class="label">权限模块列表</span>
         <i class="el-icon-circle-plus-outline" @click="addDept" />
       </div>
       <el-tree
@@ -24,7 +24,7 @@
     </div>
     <div class="dept_user">
       <div class="dept_user_label">
-        <span class="label">用户列表</span>
+        <span class="label">权限点列表</span>
         <i class="el-icon-circle-plus-outline" @click="userAdd" />
       </div>
       <div class="dept_user_">
@@ -55,13 +55,13 @@
     </div>
     <el-dialog width="800px" :modal-append-to-body="false" :title="title" :visible.sync="dialogFormVisible">
       <el-form ref="elForm" :model="form">
-        <el-form-item prop="value" label="上级部门" :label-width="formLabelWidth">
+        <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
           <el-cascader
             v-model="value"
             :clearable="true"
             :options="deptList"
             :props="cascaderProps"
-            placeholder="请选择上级部门"
+            placeholder="请选择上级模块"
             @change="handleChange"
           />
         </el-form-item>
@@ -70,6 +70,12 @@
         </el-form-item>
         <el-form-item prop="seq" label="顺序" :label-width="formLabelWidth">
           <el-input v-model="form.seq" :clearable="true" autocomplete="off" />
+        </el-form-item>
+        <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
+          <el-select v-model="form.status" placeholder="状态" clearable>
+            <el-option :value="0" label="禁用" />
+            <el-option :value="1" label="正常" />
+          </el-select>
         </el-form-item>
         <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
           <el-input v-model="form.remark" :clearable="true" autocomplete="off" />
@@ -107,9 +113,9 @@
         </el-form-item>
         <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
           <el-select v-model="userForm.status" placeholder="状态" clearable>
-            <el-option :value="0" label="禁用" />
-            <el-option :value="1" label="正常" />
-            <el-option :value="2" label="冻结" />
+            <el-option value="0" label="禁用" />
+            <el-option value="1" label="正常" />
+            <el-option value="2" label="冻结" />
           </el-select>
         </el-form-item>
         <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
@@ -125,9 +131,11 @@
 </template>
 <script>
 import {
-  deptTree,
-  deptAdd,
-  deptDel,
+  aclmoduleTree,
+  aclmoduleDel,
+  aclmoduleAdd,
+  aclmoduleUpdate,
+
   deptUpdate,
   register,
   userList,
@@ -150,271 +158,16 @@ export default {
         telephone: '',
         password: '',
         mail: '',
-        status: 1,
+        status: '',
         remark: '',
         deptId: ''
       },
       type: '1', // 1-编辑部门 2-新增部门
-      title: '添加部门',
+      title: '添加权限模块',
       currentDept: {},
       deptList: [],
       value: [],
-      options: [{
-        value: 'zhinan',
-        label: '指南',
-        children: [{
-          value: 'shejiyuanze',
-          label: '设计原则',
-          children: [{
-            value: 'yizhi',
-            label: '一致'
-          },
-          {
-            value: 'fankui',
-            label: '反馈'
-          },
-          {
-            value: 'xiaolv',
-            label: '效率'
-          },
-          {
-            value: 'kekong',
-            label: '可控'
-          }
-          ]
-        },
-        {
-          value: 'daohang',
-          label: '导航',
-          children: [{
-            value: 'cexiangdaohang',
-            label: '侧向导航'
-          },
-          {
-            value: 'dingbudaohang',
-            label: '顶部导航'
-          }
-          ]
-        }
-        ]
-      },
-      {
-        value: 'zujian',
-        label: '组件',
-        children: [{
-          value: 'basic',
-          label: 'Basic',
-          children: [{
-            value: 'layout',
-            label: 'Layout 布局'
-          },
-          {
-            value: 'color',
-            label: 'Color 色彩'
-          },
-          {
-            value: 'typography',
-            label: 'Typography 字体'
-          },
-          {
-            value: 'icon',
-            label: 'Icon 图标'
-          },
-          {
-            value: 'button',
-            label: 'Button 按钮'
-          }
-          ]
-        },
-        {
-          value: 'form',
-          label: 'Form',
-          children: [{
-            value: 'radio',
-            label: 'Radio 单选框'
-          },
-          {
-            value: 'checkbox',
-            label: 'Checkbox 多选框'
-          },
-          {
-            value: 'input',
-            label: 'Input 输入框'
-          },
-          {
-            value: 'input-number',
-            label: 'InputNumber 计数器'
-          },
-          {
-            value: 'select',
-            label: 'Select 选择器'
-          },
-          {
-            value: 'cascader',
-            label: 'Cascader 级联选择器'
-          },
-          {
-            value: 'switch',
-            label: 'Switch 开关'
-          },
-          {
-            value: 'slider',
-            label: 'Slider 滑块'
-          },
-          {
-            value: 'time-picker',
-            label: 'TimePicker 时间选择器'
-          },
-          {
-            value: 'date-picker',
-            label: 'DatePicker 日期选择器'
-          },
-          {
-            value: 'datetime-picker',
-            label: 'DateTimePicker 日期时间选择器'
-          },
-          {
-            value: 'upload',
-            label: 'Upload 上传'
-          },
-          {
-            value: 'rate',
-            label: 'Rate 评分'
-          },
-          {
-            value: 'form',
-            label: 'Form 表单'
-          }
-          ]
-        },
-        {
-          value: 'data',
-          label: 'Data',
-          children: [{
-            value: 'table',
-            label: 'Table 表格'
-          },
-          {
-            value: 'tag',
-            label: 'Tag 标签'
-          },
-          {
-            value: 'progress',
-            label: 'Progress 进度条'
-          },
-          {
-            value: 'tree',
-            label: 'Tree 树形控件'
-          },
-          {
-            value: 'pagination',
-            label: 'Pagination 分页'
-          },
-          {
-            value: 'badge',
-            label: 'Badge 标记'
-          }
-          ]
-        },
-        {
-          value: 'notice',
-          label: 'Notice',
-          children: [{
-            value: 'alert',
-            label: 'Alert 警告'
-          },
-          {
-            value: 'loading',
-            label: 'Loading 加载'
-          },
-          {
-            value: 'message',
-            label: 'Message 消息提示'
-          },
-          {
-            value: 'message-box',
-            label: 'MessageBox 弹框'
-          },
-          {
-            value: 'notification',
-            label: 'Notification 通知'
-          }
-          ]
-        },
-        {
-          value: 'navigation',
-          label: 'Navigation',
-          children: [{
-            value: 'menu',
-            label: 'NavMenu 导航菜单'
-          },
-          {
-            value: 'tabs',
-            label: 'Tabs 标签页'
-          },
-          {
-            value: 'breadcrumb',
-            label: 'Breadcrumb 面包屑'
-          },
-          {
-            value: 'dropdown',
-            label: 'Dropdown 下拉菜单'
-          },
-          {
-            value: 'steps',
-            label: 'Steps 步骤条'
-          }
-          ]
-        },
-        {
-          value: 'others',
-          label: 'Others',
-          children: [{
-            value: 'dialog',
-            label: 'Dialog 对话框'
-          },
-          {
-            value: 'tooltip',
-            label: 'Tooltip 文字提示'
-          },
-          {
-            value: 'popover',
-            label: 'Popover 弹出框'
-          },
-          {
-            value: 'card',
-            label: 'Card 卡片'
-          },
-          {
-            value: 'carousel',
-            label: 'Carousel 走马灯'
-          },
-          {
-            value: 'collapse',
-            label: 'Collapse 折叠面板'
-          }
-          ]
-        }
-        ]
-      },
-      {
-        value: 'ziyuan',
-        label: '资源',
-        children: [{
-          value: 'axure',
-          label: 'Axure Components'
-        },
-        {
-          value: 'sketch',
-          label: 'Sketch Templates'
-        },
-        {
-          value: 'jiaohu',
-          label: '组件交互文档'
-        }
-        ]
-      }
-      ],
+      options: [],
       tree: [],
       defaultProps: {
         children: 'deptList',
@@ -427,6 +180,7 @@ export default {
         parent_id: 0,
         name: '',
         seq: '',
+        status: 1,
         remark: ''
       },
       formLabelWidth: '120px',
@@ -503,7 +257,6 @@ export default {
       this.userVisible = true
     },
     async submit() {
-      console.log(this.value)
       const len = this.userDeptList.length - 1
       this.userForm.deptId = this.userDeptList[len]
       const {
@@ -533,25 +286,26 @@ export default {
     },
     async sure() {
       if (this.type === '2') {
-        console.log(this.value)
         const len = this.value.length - 1
         this.form.parent_id = this.value[len]
         const {
           parent_id: parentId,
           name,
           seq,
+          status,
           remark
         } = this.form
-        const res = await deptAdd({
+        const res = await aclmoduleAdd({
           parentId,
           name,
           seq,
+          status,
           remark
         })
         if (res && res.data.code === 0) {
           this.form = {}
           this.dialogFormVisible = false
-          this.$message.success('添加部门成功')
+          this.$message.success('添加权限模块成功')
           this.init()
         }
       } else if (this.type === '1') {
@@ -559,20 +313,22 @@ export default {
           parent_id: parentId,
           name,
           seq,
+          status,
           remark,
           id
         } = this.form
-        const updateRes = await deptUpdate({
+        const updateRes = await aclmoduleUpdate({
           parentId,
           name,
           seq,
+          status,
           remark,
           id
         })
         if (updateRes && updateRes.data.code === 0) {
           this.form = {}
           this.dialogFormVisible = false
-          this.$message.success('更新部门成功')
+          this.$message.success('更新权限模块成功')
           this.init()
         }
       }
@@ -580,7 +336,7 @@ export default {
     handleChange(value) {},
     addDept() {
       this.type = '2'
-      this.title = '添加部门'
+      this.title = '添加权限模块'
       this.dialogFormVisible = true
     },
     del(item) {
@@ -590,7 +346,7 @@ export default {
         type: 'warning'
       })
         .then(async() => {
-          const res = await deptDel({
+          const res = await aclmoduleDel({
             id: item.id
           })
           if (res && res.data.code === 0) {
@@ -632,13 +388,13 @@ export default {
       return arr
     },
     init() {
-      Promise.all([this.deptTree()])
+      Promise.all([this.aclmoduleTree()])
         .then(res => {})
         .catch(e => {})
     },
 
-    async deptTree() {
-      const res = await deptTree()
+    async aclmoduleTree() {
+      const res = await aclmoduleTree()
       if (res && res.data.code === 0) {
         const tree = res.data.data
         this.tree = this.getTreeData(tree)

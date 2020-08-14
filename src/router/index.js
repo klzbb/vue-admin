@@ -53,13 +53,24 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/login',
     children: [
       {
         path: 'dept',
         component: () => import('@/views/dept/index'),
         name: 'Dept',
         meta: { title: '部门管理', icon: 'icon', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/permission',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/permission/index'),
+        name: 'Permission',
+        meta: { title: '权限管理', icon: 'icon', noCache: true }
       }
     ]
   },
@@ -83,18 +94,6 @@ export const constantRoutes = [
     component: () => import('@/views/error-page/401'),
     hidden: true
   },
-  // {
-  //   path: '/',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'dashboard',
-  //       component: () => import('@/views/dashboard/index'),
-  //       name: 'Dashboard',
-  //       meta: { title: 'Dashboard', icon: 'dashboard', affix: true }
-  //     }
-  //   ]
-  // },
   {
     path: '/documentation',
     component: Layout,

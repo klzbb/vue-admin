@@ -4,9 +4,19 @@
  * @Author: Author
  * @Date: 2020-07-21 16:35:03
  * @LastEditors: konglingzhan
- * @LastEditTime: 2020-08-14 14:53:01
+ * @LastEditTime: 2020-08-14 17:17:24
  */
 import axios from '@/utils/request.js'
+
+/* 把对象转化为formData表单格式 */
+const formUtil = (obj) => {
+  const formData = new FormData()
+  if (!obj || Object.keys(obj).length === 0) { return formData }
+  for (const key in obj) {
+    formData.append(key, obj[key])
+  }
+  return formData
+}
 
 // 部门树
 export const deptTree = params => axios.post('/app/dept/tree', params)
@@ -49,16 +59,6 @@ export const delUserById = (params) => axios({
   data: formUtil(params)
 })
 
-/* 把对象转化为formData表单格式 */
-const formUtil = (obj) => {
-  const formData = new FormData()
-  if (Object.keys(obj).length === 0) { return formData }
-  for (const key in obj) {
-    formData.append(key, obj[key])
-  }
-  return formData
-}
-
 // 登录
 export const login = params => axios({
   url: '/app/user/login',
@@ -70,4 +70,31 @@ export const login = params => axios({
 export const logout = () => axios({
   url: '/app/user/logout',
   method: 'get'
+})
+
+// 权限模块树
+export const aclmoduleTree = () => axios({
+  url: '/app/aclmodule/tree',
+  method: 'post'
+})
+
+// 权限模块add
+export const aclmoduleAdd = params => axios({
+  url: '/app/aclmodule/add',
+  method: 'post',
+  data: formUtil(params)
+})
+
+// 权限模块update
+export const aclmoduleUpdate = params => axios({
+  url: '/app/aclmodule/update',
+  method: 'post',
+  data: formUtil(params)
+})
+
+// 权限模块delete
+export const aclmoduleDel = params => axios({
+  url: '/app/aclmodule/del',
+  method: 'post',
+  data: formUtil(params)
 })
