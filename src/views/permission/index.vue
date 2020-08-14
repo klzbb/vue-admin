@@ -253,7 +253,7 @@ export default {
     userAdd() {
       this.userForm = {}
       this.userDeptList = []
-      this.userTitle = '添加用户'
+      this.userTitle = '添加权限点'
       this.userVisible = true
     },
     async submit() {
