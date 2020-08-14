@@ -53,7 +53,7 @@ import ErrorLog from '@/components/ErrorLog'
 import Screenfull from '@/components/Screenfull'
 import SizeSelect from '@/components/SizeSelect'
 import Search from '@/components/HeaderSearch'
-
+import { logout } from '@/api/index.js'
 export default {
   components: {
     Breadcrumb,
@@ -75,8 +75,11 @@ export default {
       this.$store.dispatch('app/toggleSideBar')
     },
     async logout() {
-      await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+      const res = await logout()
+      if (res && res.data.code === 0) {
+        this.$router.push(`/login?redirect=${this.$route.fullPath}`)
+        this.$message.success('登出成功')
+      }
     }
   }
 }

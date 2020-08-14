@@ -4,7 +4,7 @@
  * @Author: Author
  * @Date: 2020-07-21 16:35:03
  * @LastEditors: konglingzhan
- * @LastEditTime: 2020-08-12 16:08:16
+ * @LastEditTime: 2020-08-14 14:53:01
  */
 import axios from '@/utils/request.js'
 
@@ -64,4 +64,10 @@ export const login = params => axios({
   url: '/app/user/login',
   method: 'post',
   data: formUtil(params)
+})
+
+// 登出
+export const logout = () => axios({
+  url: '/app/user/logout',
+  method: 'get'
 })
