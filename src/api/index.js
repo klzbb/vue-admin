@@ -98,3 +98,34 @@ export const aclmoduleDel = params => axios({
   method: 'post',
   data: formUtil(params)
 })
+
+// 权限点add
+export const aclAdd = (params) => axios({
+  url: '/app/acl/add',
+  method: 'post',
+  data: formUtil(params)
+})
+// 权限点update
+export const aclUpdate = (params) => axios({
+  url: '/app/acl/update',
+  method: 'post',
+  data: formUtil(params)
+})
+// 权限点delete
+export const aclDel = (params) => axios({
+  url: '/app/acl/del',
+  method: 'post',
+  data: formUtil(params)
+})
+// 权限点分页
+export const aclPageList = (params) => axios({
+  url: '/app/acl/pagelist',
+  method: 'post',
+  data: formUtil(params)
+})
+
+// 获取用户信息
+export const getUserInfo = () => axios({
+  url: '/app/user/getUserInfo',
+  method: 'post'
+})

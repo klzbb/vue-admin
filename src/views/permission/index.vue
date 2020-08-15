@@ -29,12 +29,12 @@
       </div>
       <div class="dept_user_">
         <el-table :data="userList" style="width: 100%">
-          <el-table-column prop="username" label="姓名" width="180" />
+          <el-table-column prop="name" label="权限点名称" width="180" />
 
-          <el-table-column prop="dept_id" label="所属部门" width="180" />
+          <el-table-column prop="acl_module_id" label="所属模块" width="180" />
 
-          <el-table-column prop="mail" label="邮箱" width="180" />
-          <el-table-column prop="telephone" label="电话" width="180" />
+          <el-table-column prop="url" label="链接" width="180" />
+          <el-table-column prop="type" label="权限点类型" width="180" />
           <el-table-column prop="status" label="状态" width="180" />
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -89,34 +89,37 @@
 
     <el-dialog width="800px" :modal-append-to-body="false" :title="userTitle" :visible.sync="userVisible">
       <el-form ref="userForm" :model="userForm">
-        <el-form-item prop="value" label="上级部门" :label-width="formLabelWidth">
+        <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
           <el-cascader
             v-model="userDeptList"
             :clearable="true"
             :options="tree"
             :props="cascaderProps"
-            placeholder="请选择上级部门"
+            placeholder="请选择上级权限模块"
             @change="handleChange"
           />
         </el-form-item>
-        <el-form-item prop="username" label="用户名" :label-width="formLabelWidth">
-          <el-input v-model="userForm.username" placeholder="用户名" clearable autocomplete="off" />
+        <el-form-item prop="name" label="权限点名称" :label-width="formLabelWidth">
+          <el-input v-model="userForm.name" placeholder="权限点名称" clearable autocomplete="off" />
         </el-form-item>
-        <el-form-item prop="password" label="密码" :label-width="formLabelWidth">
-          <el-input v-model="userForm.password" placeholder="密码" clearable autocomplete="off" />
+        <el-form-item prop="url" label="功能链接" :label-width="formLabelWidth">
+          <el-input v-model="userForm.url" placeholder="功能链接" clearable autocomplete="off" />
         </el-form-item>
-        <el-form-item prop="telephone" label="电话号码" :label-width="formLabelWidth">
-          <el-input v-model="userForm.telephone" placeholder="电话号码" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="mail" label="邮箱" :label-width="formLabelWidth">
-          <el-input v-model="userForm.mail" placeholder="邮箱" clearable autocomplete="off" />
+        <el-form-item prop="type" label="类型" :label-width="formLabelWidth">
+          <el-select v-model="userForm.type" placeholder="类型" clearable>
+            <el-option :value="1" label="菜单" />
+            <el-option :value="2" label="按钮" />
+            <el-option :value="3" label="其他" />
+          </el-select>
         </el-form-item>
         <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
           <el-select v-model="userForm.status" placeholder="状态" clearable>
-            <el-option value="0" label="禁用" />
-            <el-option value="1" label="正常" />
-            <el-option value="2" label="冻结" />
+            <el-option :value="0" label="冻结" />
+            <el-option :value="1" label="正常" />
           </el-select>
+        </el-form-item>
+        <el-form-item prop="seq" label="展示顺序" :label-width="formLabelWidth">
+          <el-input v-model="userForm.seq" placeholder="展示顺序" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
           <el-input v-model="userForm.remark" placeholder="备注" clearable autocomplete="off" />
@@ -135,6 +138,10 @@ import {
   aclmoduleDel,
   aclmoduleAdd,
   aclmoduleUpdate,
+  aclAdd,
+  aclDel,
+  aclUpdate,
+  aclPageList,
 
   deptUpdate,
   register,
@@ -145,7 +152,7 @@ export default {
   name: 'Dept',
   data() {
     return {
-      deptId: '',
+      aclModuleId: '',
       pageNo: 1,
       pageSize: 10,
       userList: [],
@@ -154,13 +161,13 @@ export default {
       userVisible: false,
       userDeptList: [],
       userForm: {
-        username: '',
-        telephone: '',
-        password: '',
-        mail: '',
-        status: '',
-        remark: '',
-        deptId: ''
+        name: '',
+        aclModuleId: '',
+        url: '',
+        type: '',
+        status: 1,
+        seq: '',
+        remark: ''
       },
       type: '1', // 1-编辑部门 2-新增部门
       title: '添加权限模块',
@@ -218,7 +225,7 @@ export default {
           })
           if (res && res.data.code === 0) {
             this.$message.success('删除成功')
-            this.selectUserListByDeptId(this.deptId)
+            this.selectAclListByAclModuleId(this.aclModuleId)
           }
         })
         .catch(() => {
@@ -233,18 +240,18 @@ export default {
     },
     nodeClick(data) {
       const {
-        id: deptId
+        id: aclModuleId
       } = data
-      this.deptId = deptId
-      this.selectUserListByDeptId(deptId)
+      this.aclModuleId = aclModuleId
+      this.selectAclListByAclModuleId(aclModuleId)
     },
-    async selectUserListByDeptId(deptId) {
+    async selectAclListByAclModuleId(aclModuleId) {
       const params = {
-        deptId,
+        aclModuleId,
         pageNo: this.pageNo,
         pageSize: this.pageSize
       }
-      const res = await userList(params)
+      const res = await aclPageList(params)
       if (res && res.data.code === 0) {
         this.userList = res.data.data.data
         this.total = res.data.data.total
@@ -258,30 +265,30 @@ export default {
     },
     async submit() {
       const len = this.userDeptList.length - 1
-      this.userForm.deptId = this.userDeptList[len]
+      this.userForm.aclModuleId = this.userDeptList[len]
       const {
-        username,
-        telephone,
-        password,
-        mail,
+        name,
+        aclModuleId,
+        url,
+        type,
         status,
-        remark,
-        deptId
+        seq,
+        remark
       } = this.userForm
 
-      const res = await register({
-        username,
-        telephone,
-        password,
-        mail,
+      const res = await aclAdd({
+        name,
+        aclModuleId,
+        url,
+        type,
         status,
-        remark,
-        deptId
+        seq,
+        remark
       })
       if (res && res.data.code === 0) {
         this.userVisible = false
-        this.$message.success('用户注册成功')
-        if (this.deptId) this.selectUserListByDeptId(this.deptId)
+        this.$message.success('权限点新增成功')
+        if (this.aclModuleId) this.selectAclListByAclModuleId(this.aclModuleId)
       }
     },
     async sure() {
@@ -340,7 +347,7 @@ export default {
       this.dialogFormVisible = true
     },
     del(item) {
-      this.$confirm('部门删除后将不可恢复，是否继续?', '提示', {
+      this.$confirm('权限模块删除后将不可恢复，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -363,7 +370,7 @@ export default {
     },
     edit(item) {
       this.type = '1'
-      this.title = '编辑部门'
+      this.title = '编辑权限模块'
       this.form = {
         ...item
       }

@@ -10,7 +10,7 @@ import axios from 'axios'
 import { MessageBox, Message } from 'element-ui'
 import store from '@/store'
 import { getToken } from '@/utils/auth'
-
+import router from '@/router/index.js'
 // create an axios instance
 const service = axios.create({
   // baseURL: process.env.VUE_APP_SERVICE_URL, // url = base url + request url
@@ -50,32 +50,24 @@ service.interceptors.response.use(
    * Here is just an example
    * You can also judge the status by HTTP Status Code
    */
-  response => {
-    const res = response
-
-    // if the custom code is not 20000, it is judged as an error.
-    if (res.data.code !== 0) {
+  res => {
+    const { code } = res.data
+    const condition = [0]
+    if (condition.includes(code)) {
+      return res
+    } else if (code === 401) {
+      router.push({ path: '/login' })
+      Message({
+        message: '登录态失效',
+        type: 'error',
+        duration: 5 * 1000
+      })
+    } else {
       Message({
         message: res.data.msg || 'Error',
         type: 'error',
         duration: 5 * 1000
       })
-
-      // 50008: Illegal token; 50012: Other clients logged in; 50014: Token expired;
-      // if (res.code === 50008 || res.code === 50012 || res.code === 50014) {
-      //   // to re-login
-      //   MessageBox.confirm('You have been logged out, you can cancel to stay on this page, or log in again', 'Confirm logout', {
-      //     confirmButtonText: 'Re-Login',
-      //     cancelButtonText: 'Cancel',
-      //     type: 'warning'
-      //   }).then(() => {
-      //     store.dispatch('user/resetToken').then(() => {
-      //       location.reload()
-      //     })
-      //   })
-      // }
-    } else {
-      return res
     }
   },
   error => {

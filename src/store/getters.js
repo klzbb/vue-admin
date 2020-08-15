@@ -1,4 +1,14 @@
+import { getSession } from '@/utils/sessionUtil.js'
+
 const getters = {
+  loginStatus: state => {
+    if (getSession('LOGIN_STATUS')) state.user.loginStatus = getSession('LOGIN_STATUS')
+    return state.user.loginStatus
+  },
+  userInfo: state => {
+    if (getSession('USER_INFO', true)) state.user.userInfo = getSession('USER_INFO')
+    return state.user.userInfo
+  },
   sidebar: state => state.app.sidebar,
   size: state => state.app.size,
   device: state => state.app.device,
