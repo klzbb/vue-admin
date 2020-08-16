@@ -349,7 +349,6 @@ export default {
       this.form = {
         ...item
       }
-      console.log(this.form)
       this.value = this.formatToValue(item)
       this.dialogFormVisible = true
     },

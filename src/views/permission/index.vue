@@ -38,7 +38,7 @@
           <el-table-column prop="status" label="状态" width="180" />
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button type="text" size="small" @click="userEdit(scope.row)">编辑</el-button>
+              <el-button type="text" size="small" @click="aclEdit(scope.row)">编辑</el-button>
               <el-button type="text" size="small" @click="userDel(scope.row)">删除</el-button>
             </template>
           </el-table-column>
@@ -53,7 +53,12 @@
         />
       </div>
     </div>
-    <el-dialog width="800px" :modal-append-to-body="false" :title="title" :visible.sync="dialogFormVisible">
+    <el-dialog
+      width="800px"
+      :modal-append-to-body="false"
+      :title="title"
+      :visible.sync="dialogFormVisible"
+    >
       <el-form ref="elForm" :model="form">
         <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
           <el-cascader
@@ -87,11 +92,16 @@
       </div>
     </el-dialog>
 
-    <el-dialog width="800px" :modal-append-to-body="false" :title="userTitle" :visible.sync="userVisible">
-      <el-form ref="userForm" :model="userForm">
+    <el-dialog
+      width="800px"
+      :modal-append-to-body="false"
+      :title="aclTitle"
+      :visible.sync="userVisible"
+    >
+      <el-form ref="aclForm" :model="aclForm">
         <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
           <el-cascader
-            v-model="userDeptList"
+            v-model="aclCasValue"
             :clearable="true"
             :options="tree"
             :props="cascaderProps"
@@ -100,29 +110,29 @@
           />
         </el-form-item>
         <el-form-item prop="name" label="权限点名称" :label-width="formLabelWidth">
-          <el-input v-model="userForm.name" placeholder="权限点名称" clearable autocomplete="off" />
+          <el-input v-model="aclForm.name" placeholder="权限点名称" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="url" label="功能链接" :label-width="formLabelWidth">
-          <el-input v-model="userForm.url" placeholder="功能链接" clearable autocomplete="off" />
+          <el-input v-model="aclForm.url" placeholder="功能链接" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="type" label="类型" :label-width="formLabelWidth">
-          <el-select v-model="userForm.type" placeholder="类型" clearable>
+          <el-select v-model="aclForm.type" placeholder="类型" clearable>
             <el-option :value="1" label="菜单" />
             <el-option :value="2" label="按钮" />
             <el-option :value="3" label="其他" />
           </el-select>
         </el-form-item>
         <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
-          <el-select v-model="userForm.status" placeholder="状态" clearable>
+          <el-select v-model="aclForm.status" placeholder="状态" clearable>
             <el-option :value="0" label="冻结" />
             <el-option :value="1" label="正常" />
           </el-select>
         </el-form-item>
         <el-form-item prop="seq" label="展示顺序" :label-width="formLabelWidth">
-          <el-input v-model="userForm.seq" placeholder="展示顺序" clearable autocomplete="off" />
+          <el-input v-model="aclForm.seq" placeholder="展示顺序" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
-          <el-input v-model="userForm.remark" placeholder="备注" clearable autocomplete="off" />
+          <el-input v-model="aclForm.remark" placeholder="备注" clearable autocomplete="off" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -142,7 +152,6 @@ import {
   aclDel,
   aclUpdate,
   aclPageList,
-
   deptUpdate,
   register,
   userList,
@@ -157,10 +166,10 @@ export default {
       pageSize: 10,
       userList: [],
       total: 0,
-      userTitle: '添加用户',
+      aclTitle: '添加用户',
       userVisible: false,
-      userDeptList: [],
-      userForm: {
+      aclCasValue: [],
+      aclForm: {
         name: '',
         aclModuleId: '',
         url: '',
@@ -200,6 +209,11 @@ export default {
       }
     }
   },
+  watch: {
+    aclCasValue(cur, old) {
+      console.log(cur)
+    }
+  },
   mounted() {
     this.init()
   },
@@ -211,9 +225,7 @@ export default {
       console.log(`当前页: ${val}`)
     },
     userDel(row) {
-      const {
-        id
-      } = row
+      const { id } = row
       this.$confirm('用户删除后将不可恢复，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -235,13 +247,51 @@ export default {
           })
         })
     },
-    userEdit(row) {
-
+    aclEdit(row) {
+      this.aclForm = { ...row }
+      this.aclTitle = '编辑权限点'
+      this.aclCasValue = this.deepByParentId(this.tree, row.acl_module_id)
+      this.userVisible = true
+    },
+    /**
+     * 根据tree 和 parentId 转化aclCasValue值
+     * @param tree 树状数据结构
+     * @param parentId 当前权限点父级权限模块id
+     * @return array
+     */
+    deepByParentId(tree, parentId) {
+      const temp = []
+      function deep(arr, parentId) {
+        const casVulueArr = []
+        for (let i = 0; i < arr.length; i++) {
+          casVulueArr.push(arr[i].id)
+          if (arr[i].id !== parentId) {
+            if (arr[i].deptList && arr[i].length > 0) {
+              deep(arr[i].deptList, parentId)
+            }
+          } else {
+            break
+          }
+        }
+        return casVulueArr
+      }
+      // 取得parentId所属的顶层权限模块
+      for (let i = 0; i < tree.length; i++) {
+        // console.log(tree[i])
+        if (parentId === tree[i].id) {
+          temp.push(tree[i])
+          break
+        } else {
+          if (tree[i].deptList && tree[i].deptList.length > 0) {
+            this.deepByParentId(tree[i].deptList, parentId)
+          }
+        }
+      }
+      const result = deep(temp, parentId)
+      return result
     },
     nodeClick(data) {
-      const {
-        id: aclModuleId
-      } = data
+      const { id: aclModuleId } = data
       this.aclModuleId = aclModuleId
       this.selectAclListByAclModuleId(aclModuleId)
     },
@@ -258,14 +308,14 @@ export default {
       }
     },
     userAdd() {
-      this.userForm = {}
-      this.userDeptList = []
-      this.userTitle = '添加权限点'
+      this.aclForm = {}
+      this.aclCasValue = []
+      this.aclTitle = '添加权限点'
       this.userVisible = true
     },
     async submit() {
-      const len = this.userDeptList.length - 1
-      this.userForm.aclModuleId = this.userDeptList[len]
+      const len = this.aclCasValue.length - 1
+      this.aclForm.aclModuleId = this.aclCasValue[len]
       const {
         name,
         aclModuleId,
@@ -274,7 +324,7 @@ export default {
         status,
         seq,
         remark
-      } = this.userForm
+      } = this.aclForm
 
       const res = await aclAdd({
         name,
@@ -295,13 +345,7 @@ export default {
       if (this.type === '2') {
         const len = this.value.length - 1
         this.form.parent_id = this.value[len]
-        const {
-          parent_id: parentId,
-          name,
-          seq,
-          status,
-          remark
-        } = this.form
+        const { parent_id: parentId, name, seq, status, remark } = this.form
         const res = await aclmoduleAdd({
           parentId,
           name,
@@ -406,13 +450,28 @@ export default {
         const tree = res.data.data
         this.tree = this.getTreeData(tree)
         this.deptList = this.formMatch(tree)
+        this.deep(tree)
       }
     },
+    deep(tree) {
+      const arr = []
+      for (let i = 0; i < tree.length; i++) {
+        console.log('i=', i)
+        arr.push(tree[i].id)
+        // console.log(tree[i])
+        if (tree[i].deptList && tree[i].deptList.length > 0) {
+          this.deep(tree[i].deptList)
+        }
+      }
+      // console.log('arr=', arr)
+    },
     formMatch(list) {
-      const arr = [{
-        name: '无',
-        id: 0
-      }]
+      const arr = [
+        {
+          name: '无',
+          id: 0
+        }
+      ]
       const result = arr.concat(list)
       return result
     },
@@ -431,68 +490,66 @@ export default {
     }
   }
 }
-
 </script>
 <style lang="scss">
-  .dept {
-    padding: 15px;
-    position: relative;
+.dept {
+  padding: 15px;
+  position: relative;
 
-    &_dept {
-      width: 350px;
+  &_dept {
+    width: 350px;
 
-      &_label {
-        background-color: #409eff;
-        color: #fff;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 5px;
-        margin-bottom: 10px;
+    &_label {
+      background-color: #409eff;
+      color: #fff;
+      height: 40px;
+      line-height: 40px;
+      padding: 0 5px;
+      margin-bottom: 10px;
 
-        .label {
-          margin-right: 20px;
-        }
-      }
-
-      &_tree_item {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 14px;
-        padding-right: 8px;
+      .label {
+        margin-right: 20px;
       }
     }
 
-    &_user {
-      width: 100%;
-      position: absolute;
-      top: 15px;
-      left: 365px;
-      padding-left: 30px;
-
-      &_label {
-        background-color: #409eff;
-        color: #fff;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 5px;
-        margin-bottom: 10px;
-
-        .label {
-          margin-right: 20px;
-        }
-      }
-    }
-
-    // reset element-ui css
-    .el-cascader {
-      display: block;
-    }
-
-    .el-select {
-      display: block;
+    &_tree_item {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 14px;
+      padding-right: 8px;
     }
   }
 
+  &_user {
+    width: 100%;
+    position: absolute;
+    top: 15px;
+    left: 365px;
+    padding-left: 30px;
+
+    &_label {
+      background-color: #409eff;
+      color: #fff;
+      height: 40px;
+      line-height: 40px;
+      padding: 0 5px;
+      margin-bottom: 10px;
+
+      .label {
+        margin-right: 20px;
+      }
+    }
+  }
+
+  // reset element-ui css
+  .el-cascader {
+    display: block;
+  }
+
+  .el-select {
+    display: block;
+  }
+}
 </style>
