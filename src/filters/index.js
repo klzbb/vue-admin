@@ -1,5 +1,13 @@
+/*
+ * @Descripttion: DOP
+ * @version: 1.0.0
+ * @Author: Author
+ * @Date: 2020-07-27 17:29:06
+ * @LastEditors: konglingzhan
+ * @LastEditTime: 2020-08-17 14:00:19
+ */
 // import parseTime, formatTime and set to filter
-export { parseTime, formatTime } from '@/utils'
+export { parseTime, formatTime } from '@/utils';
 
 /**
  * Show plural label if time is plural number
@@ -9,22 +17,22 @@ export { parseTime, formatTime } from '@/utils'
  */
 function pluralize(time, label) {
   if (time === 1) {
-    return time + label
+    return time + label;
   }
-  return time + label + 's'
+  return time + label + 's';
 }
 
 /**
  * @param {number} time
  */
 export function timeAgo(time) {
-  const between = Date.now() / 1000 - Number(time)
+  const between = Date.now() / 1000 - Number(time);
   if (between < 3600) {
-    return pluralize(~~(between / 60), ' minute')
+    return pluralize(~~(between / 60), ' minute');
   } else if (between < 86400) {
-    return pluralize(~~(between / 3600), ' hour')
+    return pluralize(~~(between / 3600), ' hour');
   } else {
-    return pluralize(~~(between / 86400), ' day')
+    return pluralize(~~(between / 86400), ' day');
   }
 }
 
@@ -42,13 +50,13 @@ export function numberFormatter(num, digits) {
     { value: 1E9, symbol: 'G' },
     { value: 1E6, symbol: 'M' },
     { value: 1E3, symbol: 'k' }
-  ]
+  ];
   for (let i = 0; i < si.length; i++) {
     if (num >= si[i].value) {
-      return (num / si[i].value).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1') + si[i].symbol
+      return (num / si[i].value).toFixed(digits).replace(/\.0+$|(\.[0-9]*[1-9])0+$/, '$1') + si[i].symbol;
     }
   }
-  return num.toString()
+  return num.toString();
 }
 
 /**
@@ -56,7 +64,7 @@ export function numberFormatter(num, digits) {
  * @param {number} num
  */
 export function toThousandFilter(num) {
-  return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','))
+  return (+num || 0).toString().replace(/^-?\d+/g, m => m.replace(/(?=(?!\b)(\d{3})+$)/g, ','));
 }
 
 /**
@@ -64,5 +72,27 @@ export function toThousandFilter(num) {
  * @param {String} string
  */
 export function uppercaseFirst(string) {
-  return string.charAt(0).toUpperCase() + string.slice(1)
+  return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
+/**
+ * 权限点类型 1-菜单 2-按钮 3-其他
+ * @param {Number} type
+ */
+export function v10001(type) {
+  let text;
+  switch (type) {
+    case 1:
+      text = '菜单';
+      break;
+    case 2:
+      text = '按钮';
+      break;
+    case 3:
+      text = '其他';
+      break;
+    default:
+      break;
+  }
+  return text;
 }

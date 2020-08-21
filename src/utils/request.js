@@ -6,17 +6,17 @@
  * @LastEditors: konglingzhan
  * @LastEditTime: 2020-08-12 13:45:52
  */
-import axios from 'axios'
-import { MessageBox, Message } from 'element-ui'
-import store from '@/store'
-import { getToken } from '@/utils/auth'
-import router from '@/router/index.js'
+import axios from 'axios';
+import { MessageBox, Message } from 'element-ui';
+import store from '@/store';
+import { getToken } from '@/utils/auth';
+import router from '@/router/index.js';
 // create an axios instance
 const service = axios.create({
   // baseURL: process.env.VUE_APP_SERVICE_URL, // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   timeout: 20000 // request timeout
-})
+});
 
 // request interceptor
 service.interceptors.request.use(
@@ -27,16 +27,16 @@ service.interceptors.request.use(
       // let each request carry token
       // ['X-Token'] is a custom headers key
       // please modify it according to the actual situation
-      config.headers['X-Token'] = getToken()
+      config.headers['X-Token'] = getToken();
     }
-    return config
+    return config;
   },
   error => {
     // do something with request error
-    console.log(error) // for debug
-    return Promise.reject(error)
+    console.log(error); // for debug
+    return Promise.reject(error);
   }
-)
+);
 
 // response interceptor
 service.interceptors.response.use(
@@ -51,34 +51,34 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   res => {
-    const { code } = res.data
-    const condition = [0]
+    const { code } = res.data;
+    const condition = [0];
     if (condition.includes(code)) {
-      return res
+      return res;
     } else if (code === 401) {
-      router.push({ path: '/login' })
+      router.push({ path: '/login' });
       Message({
         message: '登录态失效',
         type: 'error',
         duration: 5 * 1000
-      })
+      });
     } else {
       Message({
         message: res.data.msg || 'Error',
         type: 'error',
         duration: 5 * 1000
-      })
+      });
     }
   },
   error => {
-    console.log('err' + error) // for debug
+    console.log('err' + error); // for debug
     Message({
       message: error.message,
       type: 'error',
       duration: 5 * 1000
-    })
-    return Promise.reject(error)
+    });
+    return Promise.reject(error);
   }
-)
+);
 
-export default service
+export default service;

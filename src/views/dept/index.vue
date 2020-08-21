@@ -30,9 +30,7 @@
       <div class="dept_user_">
         <el-table :data="userList" style="width: 100%">
           <el-table-column prop="username" label="姓名" width="180" />
-
           <el-table-column prop="dept_id" label="所属部门" width="180" />
-
           <el-table-column prop="mail" label="邮箱" width="180" />
           <el-table-column prop="telephone" label="电话" width="180" />
           <el-table-column prop="status" label="状态" width="180" />
@@ -142,7 +140,7 @@ import {
   register,
   userList,
   delUserById
-} from '@/api/index.js'
+} from '@/api/index.js';
 export default {
   name: 'Dept',
   data() {
@@ -192,20 +190,29 @@ export default {
         children: 'deptList',
         label: 'name'
       }
-    }
+    };
   },
   mounted() {
-    this.init()
+    this.init();
+    this.test1();
   },
   methods: {
+    test1() {
+      const obj = { name: 'kljsdfsdkklj' };
+      this.test2(obj);
+      console.log(obj);
+    },
+    test2(obj) {
+      obj = { name: 123, age: 123 };
+    },
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
+      console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`)
+      console.log(`当前页: ${val}`);
     },
     userDel(row) {
-      const { id } = row
+      const { id } = row;
       this.$confirm('用户删除后将不可恢复，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -214,57 +221,48 @@ export default {
         .then(async() => {
           const res = await delUserById({
             id
-          })
+          });
           if (res && res.data.code === 0) {
-            this.$message.success('删除成功')
-            this.selectUserListByDeptId(this.deptId)
+            this.$message.success('删除成功');
+            this.selectUserListByDeptId(this.deptId);
           }
         })
         .catch(() => {
           this.$message({
             type: 'info',
             message: '已取消删除'
-          })
-        })
+          });
+        });
     },
     userEdit(row) {},
     nodeClick(data) {
-      const { id: deptId } = data
-      this.deptId = deptId
-      this.selectUserListByDeptId(deptId)
+      const { id: deptId } = data;
+      this.deptId = deptId;
+      this.selectUserListByDeptId(deptId);
     },
     async selectUserListByDeptId(deptId) {
       const params = {
         deptId,
         pageNo: this.pageNo,
         pageSize: this.pageSize
-      }
-      const res = await userList(params)
+      };
+      const res = await userList(params);
       if (res && res.data.code === 0) {
-        this.userList = res.data.data.data
-        this.total = res.data.data.total
+        this.userList = res.data.data.data;
+        this.total = res.data.data.total;
       }
     },
     userAdd() {
-      this.userForm = {}
-      this.userDeptList = []
-      this.userTitle = '添加用户'
-      this.userVisible = true
+      this.userForm = {};
+      this.userDeptList = [];
+      this.userTitle = '添加用户';
+      this.userVisible = true;
     },
     async submit() {
-      console.log(this.value)
-      const len = this.userDeptList.length - 1
-      this.userForm.deptId = this.userDeptList[len]
-      const {
-        username,
-        telephone,
-        password,
-        mail,
-        status,
-        remark,
-        deptId
-      } = this.userForm
-
+      console.log(this.value);
+      const len = this.userDeptList.length - 1;
+      this.userForm.deptId = this.userDeptList[len];
+      const { username, telephone, password, mail, status, remark, deptId } = this.userForm;
       const res = await register({
         username,
         telephone,
@@ -273,53 +271,53 @@ export default {
         status,
         remark,
         deptId
-      })
+      });
       if (res && res.data.code === 0) {
-        this.userVisible = false
-        this.$message.success('用户注册成功')
-        if (this.deptId) this.selectUserListByDeptId(this.deptId)
+        this.userVisible = false;
+        this.$message.success('用户注册成功');
+        if (this.deptId) this.selectUserListByDeptId(this.deptId);
       }
     },
     async sure() {
       if (this.type === '2') {
-        console.log(this.value)
-        const len = this.value.length - 1
-        this.form.parent_id = this.value[len]
-        const { parent_id: parentId, name, seq, remark } = this.form
+        console.log(this.value);
+        const len = this.value.length - 1;
+        this.form.parent_id = this.value[len];
+        const { parent_id: parentId, name, seq, remark } = this.form;
         const res = await deptAdd({
           parentId,
           name,
           seq,
           remark
-        })
+        });
         if (res && res.data.code === 0) {
-          this.form = {}
-          this.dialogFormVisible = false
-          this.$message.success('添加部门成功')
-          this.init()
+          this.form = {};
+          this.dialogFormVisible = false;
+          this.$message.success('添加部门成功');
+          this.init();
         }
       } else if (this.type === '1') {
-        const { parent_id: parentId, name, seq, remark, id } = this.form
+        const { parent_id: parentId, name, seq, remark, id } = this.form;
         const updateRes = await deptUpdate({
           parentId,
           name,
           seq,
           remark,
           id
-        })
+        });
         if (updateRes && updateRes.data.code === 0) {
-          this.form = {}
-          this.dialogFormVisible = false
-          this.$message.success('更新部门成功')
-          this.init()
+          this.form = {};
+          this.dialogFormVisible = false;
+          this.$message.success('更新部门成功');
+          this.init();
         }
       }
     },
     handleChange(value) {},
     addDept() {
-      this.type = '2'
-      this.title = '添加部门'
-      this.dialogFormVisible = true
+      this.type = '2';
+      this.title = '添加部门';
+      this.dialogFormVisible = true;
     },
     del(item) {
       this.$confirm('部门删除后将不可恢复，是否继续?', '提示', {
@@ -330,56 +328,56 @@ export default {
         .then(async() => {
           const res = await deptDel({
             id: item.id
-          })
+          });
           if (res && res.data.code === 0) {
-            this.$message.success('删除成功')
-            this.init()
+            this.$message.success('删除成功');
+            this.init();
           }
         })
         .catch(() => {
           this.$message({
             type: 'info',
             message: '已取消删除'
-          })
-        })
+          });
+        });
     },
     edit(item) {
-      this.type = '1'
-      this.title = '编辑部门'
+      this.type = '1';
+      this.title = '编辑部门';
       this.form = {
         ...item
-      }
-      this.value = this.formatToValue(item)
-      this.dialogFormVisible = true
+      };
+      this.value = this.formatToValue(item);
+      this.dialogFormVisible = true;
     },
     // 选中部门value 值转换 0.23.34 => [23,34]
     formatToValue(item) {
-      let arr = []
+      let arr = [];
       if (item.level.indexOf('.') !== -1) {
-        const tempArr = item.level.split('.')
+        const tempArr = item.level.split('.');
         for (let i = 0; i < tempArr.length; i++) {
           if (tempArr[i] !== '0') {
-            arr.push(parseInt(tempArr[i]))
+            arr.push(parseInt(tempArr[i]));
           }
         }
       } else {
-        arr = [0]
+        arr = [0];
       }
-      console.log(arr)
-      return arr
+      console.log(arr);
+      return arr;
     },
     init() {
       Promise.all([this.deptTree()])
-        .then(res => {})
-        .catch(e => {})
+        .then((res) => {})
+        .catch((e) => {});
     },
 
     async deptTree() {
-      const res = await deptTree()
+      const res = await deptTree();
       if (res && res.data.code === 0) {
-        const tree = res.data.data
-        this.tree = this.getTreeData(tree)
-        this.deptList = this.formMatch(tree)
+        const tree = res.data.data;
+        this.tree = this.getTreeData(tree);
+        this.deptList = this.formMatch(tree);
       }
     },
     formMatch(list) {
@@ -388,25 +386,25 @@ export default {
           name: '无',
           id: 0
         }
-      ]
-      const result = arr.concat(list)
-      return result
+      ];
+      const result = arr.concat(list);
+      return result;
     },
     // 递归判断列表，把最后的children设为undefined
     getTreeData(data) {
       for (var i = 0; i < data.length; i++) {
         if (data[i].deptList.length < 1) {
           // children若为空数组，则将children设为undefined
-          data[i].deptList = undefined
+          data[i].deptList = undefined;
         } else {
           // children若不为空数组，则继续 递归调用 本方法
-          this.getTreeData(data[i].deptList)
+          this.getTreeData(data[i].deptList);
         }
       }
-      return data
+      return data;
     }
   }
-}
+};
 </script>
 <style lang="scss">
 .dept {

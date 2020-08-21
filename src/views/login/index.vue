@@ -77,8 +77,8 @@
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-import SocialSign from './components/SocialSignin'
+import { validUsername } from '@/utils/validate';
+import SocialSign from './components/SocialSignin';
 export default {
   name: 'Login',
   components: { SocialSign },
@@ -89,15 +89,15 @@ export default {
       // } else {
       //   callback()
       // }
-      callback()
-    }
+      callback();
+    };
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
+        callback(new Error('The password can not be less than 6 digits'));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
     return {
       loginForm: {
         username: '13622894595',
@@ -117,15 +117,15 @@ export default {
       showDialog: false,
       redirect: undefined,
       otherQuery: {}
-    }
+    };
   },
   watch: {
     $route: {
       handler: function(route) {
-        const query = route.query
+        const query = route.query;
         if (query) {
-          this.redirect = query.redirect
-          this.otherQuery = this.getOtherQuery(query)
+          this.redirect = query.redirect;
+          this.otherQuery = this.getOtherQuery(query);
         }
       },
       immediate: true
@@ -136,9 +136,9 @@ export default {
   },
   mounted() {
     if (this.loginForm.username === '') {
-      this.$refs.username.focus()
+      this.$refs.username.focus();
     } else if (this.loginForm.password === '') {
-      this.$refs.password.focus()
+      this.$refs.password.focus();
     }
   },
   destroyed() {
@@ -146,47 +146,47 @@ export default {
   },
   methods: {
     home() {
-      this.$router.push('/')
+      this.$router.push('/');
     },
     checkCapslock(e) {
-      const { key } = e
-      this.capsTooltip = key && key.length === 1 && key >= 'A' && key <= 'Z'
+      const { key } = e;
+      this.capsTooltip = key && key.length === 1 && key >= 'A' && key <= 'Z';
     },
     showPwd() {
       if (this.passwordType === 'password') {
-        this.passwordType = ''
+        this.passwordType = '';
       } else {
-        this.passwordType = 'password'
+        this.passwordType = 'password';
       }
       this.$nextTick(() => {
-        this.$refs.password.focus()
-      })
+        this.$refs.password.focus();
+      });
     },
     handleLogin() {
       this.$refs.loginForm.validate(async(valid) => {
         if (valid) {
-          this.loading = true
-          await this.$store.dispatch('user/login', this.loginForm)
-          await this.$store.dispatch('user/getUserInfo')
-          this.loading = false
-          this.$router.push({ name: 'Dept' })
-          this.$message.success('你已登录')
+          this.loading = true;
+          await this.$store.dispatch('user/login', this.loginForm);
+          await this.$store.dispatch('user/getUserInfo');
+          this.loading = false;
+          this.$router.push({ name: 'Dept' });
+          this.$message.success('你已登录');
         } else {
-          console.log('error submit!!')
-          return false
+          console.log('error submit!!');
+          return false;
         }
-      })
+      });
     },
     getOtherQuery(query) {
       return Object.keys(query).reduce((acc, cur) => {
         if (cur !== 'redirect') {
-          acc[cur] = query[cur]
+          acc[cur] = query[cur];
         }
-        return acc
-      }, {})
+        return acc;
+      }, {});
     }
   }
-}
+};
 </script>
 
 <style lang="scss">
