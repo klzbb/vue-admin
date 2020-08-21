@@ -1,3 +1,11 @@
+/*
+ * @Descripttion: DOP
+ * @version: 1.0.0
+ * @Author: Author
+ * @Date: 2020-07-27 17:29:06
+ * @LastEditors: konglingzhan
+ * @LastEditTime: 2020-08-18 10:55:50
+ */
 import { getSession } from '@/utils/sessionUtil.js'
 
 const getters = {
@@ -6,7 +14,7 @@ const getters = {
     return state.user.loginStatus
   },
   userInfo: state => {
-    if (getSession('USER_INFO', true)) state.user.userInfo = getSession('USER_INFO')
+    if (getSession('USER_INFO', true)) state.user.userInfo = getSession('USER_INFO', true)
     return state.user.userInfo
   },
   sidebar: state => state.app.sidebar,

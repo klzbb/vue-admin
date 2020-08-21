@@ -1,3 +1,11 @@
+/*
+ * @Descripttion: DOP
+ * @version: 1.0.0
+ * @Author: Author
+ * @Date: 2020-07-27 17:29:06
+ * @LastEditors: konglingzhan
+ * @LastEditTime: 2020-08-17 14:00:19
+ */
 // import parseTime, formatTime and set to filter
 export { parseTime, formatTime } from '@/utils'
 
@@ -65,4 +73,26 @@ export function toThousandFilter(num) {
  */
 export function uppercaseFirst(string) {
   return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+/**
+ * 权限点类型 1-菜单 2-按钮 3-其他
+ * @param {Number} type
+ */
+export function v10001(type) {
+  let text
+  switch (type) {
+    case 1:
+      text = '菜单'
+      break
+    case 2:
+      text = '按钮'
+      break
+    case 3:
+      text = '其他'
+      break
+    default:
+      break
+  }
+  return text
 }

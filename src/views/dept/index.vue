@@ -196,8 +196,17 @@ export default {
   },
   mounted() {
     this.init()
+    this.test1()
   },
   methods: {
+    test1() {
+      const obj = { name: 'kljkklj' }
+      this.test2(obj)
+      console.log(obj)
+    },
+    test2(obj) {
+      obj = { name: 123, age: 123 }
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`)
     },

@@ -2,7 +2,7 @@
   <div class="dept">
     <div class="dept_dept">
       <div class="dept_dept_label">
-        <span class="label">权限模块列表</span>
+        <span class="label">角色列表</span>
         <i class="el-icon-circle-plus-outline" @click="addDept" />
       </div>
       <el-tree
@@ -23,61 +23,34 @@
       </el-tree>
     </div>
     <div class="dept_user">
-      <div class="dept_user_label">
-        <span class="label">权限点列表</span>
-        <i class="el-icon-circle-plus-outline" @click="userAdd" />
-      </div>
+      <el-menu
+        :default-active="activeIndex2"
+        class="el-menu-demo"
+        mode="horizontal"
+        background-color="#409eff"
+        text-color="#fff"
+        active-text-color="#ffd04b"
+        @select="handleSelect"
+      >
+        <el-menu-item index="1">角色与权限</el-menu-item>
+        <el-menu-item index="4">角色与用户</el-menu-item>
+      </el-menu>
       <div class="dept_user_">
-        <el-table :data="userList" style="width: 100%">
-          <el-table-column prop="name" label="权限点名称" width="180" />
-
-          <el-table-column prop="acl_module_id" label="所属模块" width="180" />
-
-          <el-table-column prop="url" label="链接" width="180" />
-          <el-table-column prop="type" label="权限点类型" width="180">
-            <template slot-scope="scope">
-              {{ scope.row.type | v10001 }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="status" label="状态" width="180">
-            <template slot-scope="scope">
-              {{ scope.row.status === 1?"正常":"冻结" }}
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button type="text" size="small" @click="aclEdit(scope.row)">编辑</el-button>
-              <el-button type="text" size="small" @click="aclDel(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          :current-page.sync="pageNo"
-          :page-size="100"
-          layout="total, prev, pager, next"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
-        />
+        <el-tree :data="roleAclList" show-checkbox node-key="id" :default-checked-keys="[]" :props="roleAclProps">
+          <span slot-scope="{ node, data }" class="dept_dept_tree_item">
+            <span>{{ node.label }}</span>
+            <span>
+              <el-button type="text" size="mini" @click.stop="edit(data)">编辑</el-button>
+              <el-button type="text" size="mini" @click.stop="del(data)">删除</el-button>
+            </span>
+          </span>
+        </el-tree>
       </div>
     </div>
     <el-dialog width="800px" :modal-append-to-body="false" :title="title" :visible.sync="dialogFormVisible">
       <el-form ref="elForm" :model="form">
-        <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
-          <el-cascader
-            v-model="value"
-            :clearable="true"
-            :options="deptList"
-            :props="cascaderProps"
-            placeholder="请选择上级模块"
-            @change="handleChange"
-          />
-        </el-form-item>
         <el-form-item prop="name" label="名称" :label-width="formLabelWidth">
           <el-input v-model="form.name" :clearable="true" autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="seq" label="顺序" :label-width="formLabelWidth">
-          <el-input v-model="form.seq" :clearable="true" autocomplete="off" />
         </el-form-item>
         <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
           <el-select v-model="form.status" placeholder="状态" clearable>
@@ -142,6 +115,12 @@
 </template>
 <script>
 import {
+  roleAdd,
+  roleUpdate,
+  roleList,
+  roleDel,
+  roleTree,
+
   aclmoduleTree,
   aclmoduleDel,
   aclmoduleAdd,
@@ -157,13 +136,16 @@ import {
   delUserById
 } from '@/api/index.js'
 export default {
-  name: 'Dept',
+  name: 'Role',
   data() {
     return {
+      activeIndex: '1',
+      activeIndex2: '1',
+
       aclModuleId: '',
       pageNo: 1,
       pageSize: 10,
-      userList: [],
+      roleAclList: [],
       total: 0,
       aclTitle: '添加用户',
       userVisible: false,
@@ -185,16 +167,18 @@ export default {
       options: [],
       tree: [],
       defaultProps: {
+        children: 'deptList',
+        label: 'name'
+      },
+      roleAclProps: {
+        isLeaf: this.leafFn,
         children: 'aclModuleList',
         label: 'name'
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
       form: {
-        value: [],
-        parent_id: 0,
         name: '',
-        seq: '',
         status: 1,
         remark: ''
       },
@@ -203,15 +187,29 @@ export default {
         checkStrictly: true,
         value: 'id',
         expandTrigger: 'hover',
-        children: 'aclModuleList',
+        children: 'deptList',
         label: 'name'
       }
+    }
+  },
+  watch: {
+    aclCasValue(cur, old) {
+      console.log(cur)
     }
   },
   mounted() {
     this.init()
   },
   methods: {
+    leafFn(data, node) {
+      if (data.aclModuleList) {
+        data.aclModuleList = data.aclModuleList.concat(data.aclList)
+      }
+      // debugger;
+    },
+    handleSelect(key, keyPath) {
+      console.log(key, keyPath)
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`)
     },
@@ -248,14 +246,16 @@ export default {
         ...row
       }
       this.aclTitle = '编辑权限点'
-      this.aclCasValue = [8, 9]
-      // this.aclCasValue = await this.getLevel(row.acl_module_id)
-      console.log(this.aclCasValue)
+      this.aclCasValue = await this.getLevel(row.acl_module_id)
       this.userVisible = true
     },
     async getLevel(aclModuleId) {
-      const res = await aclmoduleFindLevelById({ aclModuleId })
-      const { level } = res.data.data
+      const res = await aclmoduleFindLevelById({
+        aclModuleId
+      })
+      const {
+        level
+      } = res.data.data
       let result
       if (level.indexOf('.') === -1) {
         result = [level]
@@ -287,22 +287,14 @@ export default {
       return result
     },
     nodeClick(data) {
-      const {
-        id: aclModuleId
-      } = data
-      this.aclModuleId = aclModuleId
-      this.selectAclListByAclModuleId(aclModuleId)
+      this.selectAclListByAclModuleId(data.id)
     },
-    async selectAclListByAclModuleId(aclModuleId) {
-      const params = {
-        aclModuleId,
-        pageNo: this.pageNo,
-        pageSize: this.pageSize
-      }
-      const res = await aclPageList(params)
+    async selectAclListByAclModuleId(roleId) {
+      const res = await roleTree({
+        roleId
+      })
       if (res && res.data.code === 0) {
-        this.userList = res.data.data.data
-        this.total = res.data.data.total
+        this.roleAclList = res.data.data
       }
     },
     userAdd() {
@@ -341,69 +333,34 @@ export default {
     },
     async sure() {
       if (this.type === '2') {
-        const len = this.value.length - 1
-        this.form.parent_id = this.value[len]
-        const {
-          parent_id: parentId,
-          name,
-          seq,
-          status,
-          remark
-        } = this.form
-        const res = await aclmoduleAdd({
-          parentId,
-          name,
-          seq,
-          status,
-          remark
-        })
-        if (res && res.data.code === 0) {
-          this.form = {}
-          this.dialogFormVisible = false
-          this.$message.success('添加权限模块成功')
-          this.init()
-        }
+        const res = await roleAdd(this.form)
+        this.form = {}
+        this.dialogFormVisible = false
+        this.$message.success('添加角色成功')
+        this.init()
       } else if (this.type === '1') {
-        const {
-          parent_id: parentId,
-          name,
-          seq,
-          status,
-          remark,
-          id
-        } = this.form
-        const updateRes = await aclmoduleUpdate({
-          parentId,
-          name,
-          seq,
-          status,
-          remark,
-          id
-        })
-        if (updateRes && updateRes.data.code === 0) {
-          this.form = {}
-          this.dialogFormVisible = false
-          this.$message.success('更新权限模块成功')
-          this.init()
-        }
+        const res = await roleUpdate(this.form)
+        this.form = {}
+        this.dialogFormVisible = false
+        this.$message.success('更新角色成功')
+        this.init()
       }
     },
     handleChange(value) {},
     addDept() {
       this.type = '2'
-      this.form.status = 1
-      this.title = '添加权限模块'
+      this.title = '添加角色'
       this.dialogFormVisible = true
     },
     del(item) {
-      this.$confirm('权限模块删除后将不可恢复，是否继续?', '提示', {
+      this.$confirm('角色删除后将不可恢复，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(async() => {
-          const res = await aclmoduleDel({
-            id: item.id
+          const res = await roleDel({
+            roleId: item.id
           })
           if (res && res.data.code === 0) {
             this.$message.success('删除成功')
@@ -419,12 +376,10 @@ export default {
     },
     edit(item) {
       this.type = '1'
-      this.title = '编辑权限模块'
+      this.title = '编辑角色'
       this.form = {
         ...item
       }
-      console.log(this.form)
-      this.value = this.formatToValue(item)
       this.dialogFormVisible = true
     },
     // 选中部门value 值转换 0.23.34 => [23,34]
@@ -444,17 +399,16 @@ export default {
       return arr
     },
     init() {
-      Promise.all([this.aclmoduleTree()])
+      Promise.all([this.roleList()])
         .then(res => {})
         .catch(e => {})
     },
 
-    async aclmoduleTree() {
-      const res = await aclmoduleTree()
+    async roleList() {
+      const res = await roleList()
       if (res && res.data.code === 0) {
         const tree = res.data.data
-        this.tree = this.getTreeData(tree)
-        this.deptList = this.formMatch(tree)
+        this.tree = tree
       }
     },
     formMatch(list) {
@@ -468,12 +422,12 @@ export default {
     // 递归判断列表，把最后的children设为undefined
     getTreeData(data) {
       for (var i = 0; i < data.length; i++) {
-        if (data[i].aclModuleList.length < 1) {
+        if (data[i].deptList.length < 1) {
           // children若为空数组，则将children设为undefined
-          data[i].aclModuleList = undefined
+          data[i].deptList = undefined
         } else {
           // children若不为空数组，则继续 递归调用 本方法
-          this.getTreeData(data[i].aclModuleList)
+          this.getTreeData(data[i].deptList)
         }
       }
       return data
@@ -541,6 +495,11 @@ export default {
 
     .el-select {
       display: block;
+    }
+
+    .el-menu--horizontal>.el-menu-item {
+      height: 40px;
+      line-height: 40px;
     }
   }
 

@@ -4,7 +4,7 @@
  * @Author: Author
  * @Date: 2020-07-21 16:35:03
  * @LastEditors: konglingzhan
- * @LastEditTime: 2020-08-14 17:17:24
+ * @LastEditTime: 2020-08-20 10:16:59
  */
 import axios from '@/utils/request.js'
 
@@ -35,7 +35,7 @@ export const deptDel = params => axios({
 export const deptUpdate = (params) => axios({
   url: '/app/dept/update',
   method: 'post',
-  data: params
+  data: formUtil(params)
 })
 
 // 注册用户
@@ -92,6 +92,13 @@ export const aclmoduleUpdate = params => axios({
   data: formUtil(params)
 })
 
+// 权限模块level
+export const aclmoduleFindLevelById = params => axios({
+  url: '/app/aclmodule/findLevelById',
+  method: 'post',
+  data: formUtil(params)
+})
+
 // 权限模块delete
 export const aclmoduleDel = params => axios({
   url: '/app/aclmodule/del',
@@ -128,4 +135,39 @@ export const aclPageList = (params) => axios({
 export const getUserInfo = () => axios({
   url: '/app/user/getUserInfo',
   method: 'post'
+})
+
+// 角色add
+export const roleAdd = (params) => axios({
+  url: '/app/role/add',
+  method: 'post',
+  data: formUtil(params)
+})
+
+// 角色delete
+export const roleDel = (params) => axios({
+  url: '/app/role/del',
+  method: 'post',
+  data: formUtil(params)
+})
+
+// 角色list
+export const roleList = (params) => axios({
+  url: '/app/role/list',
+  method: 'post',
+  data: formUtil(params)
+})
+
+// 角色update
+export const roleUpdate = (params) => axios({
+  url: '/app/role/update',
+  method: 'post',
+  data: formUtil(params)
+})
+
+// 角色权限树
+export const roleTree = (params) => axios({
+  url: '/app/role/tree',
+  method: 'post',
+  data: formUtil(params)
 })

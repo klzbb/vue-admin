@@ -70,7 +70,19 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/permission/index'),
         name: 'Permission',
-        meta: { title: '权限管理', icon: 'icon', noCache: true }
+        meta: { title: '权限管理', icon: 'documentation', noCache: true }
+      }
+    ]
+  },
+  {
+    path: '/role',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/role/index'),
+        name: 'Role',
+        meta: { title: '角色管理', icon: 'documentation', noCache: true }
       }
     ]
   },
@@ -96,6 +108,7 @@ export const constantRoutes = [
   },
   {
     path: '/documentation',
+    hidden: true,
     component: Layout,
     children: [
       {
@@ -103,19 +116,6 @@ export const constantRoutes = [
         component: () => import('@/views/documentation/index'),
         name: 'Documentation',
         meta: { title: 'Documentation', icon: 'documentation', affix: true }
-      }
-    ]
-  },
-  {
-    path: '/guide',
-    component: Layout,
-    redirect: '/guide/index',
-    children: [
-      {
-        path: 'index',
-        component: () => import('@/views/guide/index'),
-        name: 'Guide',
-        meta: { title: 'Guide', icon: 'guide', noCache: true }
       }
     ]
   },
