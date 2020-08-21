@@ -155,7 +155,7 @@ import {
   register,
   userList,
   delUserById
-} from '@/api/index.js'
+} from '@/api/index.js';
 export default {
   name: 'Dept',
   data() {
@@ -206,22 +206,22 @@ export default {
         children: 'aclModuleList',
         label: 'name'
       }
-    }
+    };
   },
   mounted() {
-    this.init()
+    this.init();
   },
   methods: {
     handleSizeChange(val) {
-      console.log(`每页 ${val} 条`)
+      console.log(`每页 ${val} 条`);
     },
     handleCurrentChange(val) {
-      console.log(`当前页: ${val}`)
+      console.log(`当前页: ${val}`);
     },
     aclDel(row) {
       const {
         id
-      } = row
+      } = row;
       this.$confirm('权限点删除后将不可恢复，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -230,42 +230,42 @@ export default {
         .then(async() => {
           const res = await aclDel({
             id
-          })
+          });
           if (res && res.data.code === 0) {
-            this.$message.success('删除成功')
-            this.selectAclListByAclModuleId(this.aclModuleId)
+            this.$message.success('删除成功');
+            this.selectAclListByAclModuleId(this.aclModuleId);
           }
         })
         .catch(() => {
           this.$message({
             type: 'info',
             message: '已取消删除'
-          })
-        })
+          });
+        });
     },
     async aclEdit(row) {
       this.aclForm = {
         ...row
-      }
-      this.aclTitle = '编辑权限点'
-      this.aclCasValue = [8, 9]
+      };
+      this.aclTitle = '编辑权限点';
+      this.aclCasValue = [8, 9];
       // this.aclCasValue = await this.getLevel(row.acl_module_id)
-      console.log(this.aclCasValue)
-      this.userVisible = true
+      console.log(this.aclCasValue);
+      this.userVisible = true;
     },
     async getLevel(aclModuleId) {
-      const res = await aclmoduleFindLevelById({ aclModuleId })
-      const { level } = res.data.data
-      let result
+      const res = await aclmoduleFindLevelById({ aclModuleId });
+      const { level } = res.data.data;
+      let result;
       if (level.indexOf('.') === -1) {
-        result = [level]
+        result = [level];
       } else {
-        result = level.split('.')
+        result = level.split('.');
       }
-      result.push(aclModuleId)
-      result.shift()
-      result = result.map(item => parseInt(item))
-      return result
+      result.push(aclModuleId);
+      result.shift();
+      result = result.map(item => parseInt(item));
+      return result;
     },
     /**
        * 根据tree 和 parentId 转化aclCasValue值
@@ -275,45 +275,45 @@ export default {
        */
     deepByParentId(tree, parentId) {
       // 取得parentId所属的顶层权限模块
-      const level = ''
-      const result = []
-      const temp = tree.filter(item => item.id === parentId)
+      const level = '';
+      const result = [];
+      const temp = tree.filter(item => item.id === parentId);
       if (temp.length > 0) {
 
       } else {
-        this.deepByParentId()
+        this.deepByParentId();
       }
 
-      return result
+      return result;
     },
     nodeClick(data) {
       const {
         id: aclModuleId
-      } = data
-      this.aclModuleId = aclModuleId
-      this.selectAclListByAclModuleId(aclModuleId)
+      } = data;
+      this.aclModuleId = aclModuleId;
+      this.selectAclListByAclModuleId(aclModuleId);
     },
     async selectAclListByAclModuleId(aclModuleId) {
       const params = {
         aclModuleId,
         pageNo: this.pageNo,
         pageSize: this.pageSize
-      }
-      const res = await aclPageList(params)
+      };
+      const res = await aclPageList(params);
       if (res && res.data.code === 0) {
-        this.userList = res.data.data.data
-        this.total = res.data.data.total
+        this.userList = res.data.data.data;
+        this.total = res.data.data.total;
       }
     },
     userAdd() {
-      this.aclForm = {}
-      this.aclCasValue = []
-      this.aclTitle = '添加权限点'
-      this.userVisible = true
+      this.aclForm = {};
+      this.aclCasValue = [];
+      this.aclTitle = '添加权限点';
+      this.userVisible = true;
     },
     async submit() {
-      const len = this.aclCasValue.length - 1
-      this.aclForm.aclModuleId = this.aclCasValue[len]
+      const len = this.aclCasValue.length - 1;
+      this.aclForm.aclModuleId = this.aclCasValue[len];
       const {
         name,
         aclModuleId,
@@ -322,7 +322,7 @@ export default {
         status,
         seq,
         remark
-      } = this.aclForm
+      } = this.aclForm;
 
       const res = await aclAdd({
         name,
@@ -332,36 +332,36 @@ export default {
         status,
         seq,
         remark
-      })
+      });
       if (res && res.data.code === 0) {
-        this.userVisible = false
-        this.$message.success('权限点新增成功')
-        if (this.aclModuleId) this.selectAclListByAclModuleId(this.aclModuleId)
+        this.userVisible = false;
+        this.$message.success('权限点新增成功');
+        if (this.aclModuleId) this.selectAclListByAclModuleId(this.aclModuleId);
       }
     },
     async sure() {
       if (this.type === '2') {
-        const len = this.value.length - 1
-        this.form.parent_id = this.value[len]
+        const len = this.value.length - 1;
+        this.form.parent_id = this.value[len];
         const {
           parent_id: parentId,
           name,
           seq,
           status,
           remark
-        } = this.form
+        } = this.form;
         const res = await aclmoduleAdd({
           parentId,
           name,
           seq,
           status,
           remark
-        })
+        });
         if (res && res.data.code === 0) {
-          this.form = {}
-          this.dialogFormVisible = false
-          this.$message.success('添加权限模块成功')
-          this.init()
+          this.form = {};
+          this.dialogFormVisible = false;
+          this.$message.success('添加权限模块成功');
+          this.init();
         }
       } else if (this.type === '1') {
         const {
@@ -371,7 +371,7 @@ export default {
           status,
           remark,
           id
-        } = this.form
+        } = this.form;
         const updateRes = await aclmoduleUpdate({
           parentId,
           name,
@@ -379,21 +379,21 @@ export default {
           status,
           remark,
           id
-        })
+        });
         if (updateRes && updateRes.data.code === 0) {
-          this.form = {}
-          this.dialogFormVisible = false
-          this.$message.success('更新权限模块成功')
-          this.init()
+          this.form = {};
+          this.dialogFormVisible = false;
+          this.$message.success('更新权限模块成功');
+          this.init();
         }
       }
     },
     handleChange(value) {},
     addDept() {
-      this.type = '2'
-      this.form.status = 1
-      this.title = '添加权限模块'
-      this.dialogFormVisible = true
+      this.type = '2';
+      this.form.status = 1;
+      this.title = '添加权限模块';
+      this.dialogFormVisible = true;
     },
     del(item) {
       this.$confirm('权限模块删除后将不可恢复，是否继续?', '提示', {
@@ -404,82 +404,82 @@ export default {
         .then(async() => {
           const res = await aclmoduleDel({
             id: item.id
-          })
+          });
           if (res && res.data.code === 0) {
-            this.$message.success('删除成功')
-            this.init()
+            this.$message.success('删除成功');
+            this.init();
           }
         })
         .catch(() => {
           this.$message({
             type: 'info',
             message: '已取消删除'
-          })
-        })
+          });
+        });
     },
     edit(item) {
-      this.type = '1'
-      this.title = '编辑权限模块'
+      this.type = '1';
+      this.title = '编辑权限模块';
       this.form = {
         ...item
-      }
-      console.log(this.form)
-      this.value = this.formatToValue(item)
-      this.dialogFormVisible = true
+      };
+      console.log(this.form);
+      this.value = this.formatToValue(item);
+      this.dialogFormVisible = true;
     },
     // 选中部门value 值转换 0.23.34 => [23,34]
     formatToValue(item) {
-      let arr = []
+      let arr = [];
       if (item.level.indexOf('.') !== -1) {
-        const tempArr = item.level.split('.')
+        const tempArr = item.level.split('.');
         for (let i = 0; i < tempArr.length; i++) {
           if (tempArr[i] !== '0') {
-            arr.push(parseInt(tempArr[i]))
+            arr.push(parseInt(tempArr[i]));
           }
         }
       } else {
-        arr = [0]
+        arr = [0];
       }
-      console.log(arr)
-      return arr
+      console.log(arr);
+      return arr;
     },
     init() {
       Promise.all([this.aclmoduleTree()])
         .then(res => {})
-        .catch(e => {})
+        .catch(e => {});
     },
 
     async aclmoduleTree() {
-      const res = await aclmoduleTree()
+      const res = await aclmoduleTree();
       if (res && res.data.code === 0) {
-        const tree = res.data.data
-        this.tree = this.getTreeData(tree)
-        this.deptList = this.formMatch(tree)
+        const tree = res.data.data;
+        this.tree = this.getTreeData(tree);
+        this.deptList = this.formMatch(tree);
       }
     },
     formMatch(list) {
       const arr = [{
         name: '无',
         id: 0
-      }]
-      const result = arr.concat(list)
-      return result
+      }];
+      const result = arr.concat(list);
+      return result;
     },
     // 递归判断列表，把最后的children设为undefined
     getTreeData(data) {
       for (var i = 0; i < data.length; i++) {
         if (data[i].aclModuleList.length < 1) {
           // children若为空数组，则将children设为undefined
-          data[i].aclModuleList = undefined
+          data[i].aclModuleList = undefined;
         } else {
           // children若不为空数组，则继续 递归调用 本方法
-          this.getTreeData(data[i].aclModuleList)
+          this.getTreeData(data[i].aclModuleList);
         }
       }
-      return data
+      return data;
     }
   }
-}
+};
 
 </script>
 <style lang="scss">
