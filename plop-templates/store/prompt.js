@@ -1,4 +1,4 @@
-const { notEmpty } = require('../utils.js')
+const { notEmpty } = require('../utils.js');
 
 module.exports = {
   description: 'generate store',
@@ -30,20 +30,20 @@ module.exports = {
     ],
     validate(value) {
       if (!value.includes('state') || !value.includes('mutations')) {
-        return 'store require at least state and mutations'
+        return 'store require at least state and mutations';
       }
-      return true
+      return true;
     }
   }
   ],
   actions(data) {
-    const name = '{{name}}'
-    const { blocks } = data
-    const options = ['state', 'mutations']
+    const name = '{{name}}';
+    const { blocks } = data;
+    const options = ['state', 'mutations'];
     const joinFlag = `,
-  `
+  `;
     if (blocks.length === 3) {
-      options.push('actions')
+      options.push('actions');
     }
 
     const actions = [{
@@ -56,7 +56,7 @@ module.exports = {
         mutations: blocks.includes('mutations'),
         actions: blocks.includes('actions')
       }
-    }]
-    return actions
+    }];
+    return actions;
   }
-}
+};

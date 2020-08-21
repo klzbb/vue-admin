@@ -47,13 +47,13 @@
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
-import Breadcrumb from '@/components/Breadcrumb'
-import Hamburger from '@/components/Hamburger'
-import ErrorLog from '@/components/ErrorLog'
-import Screenfull from '@/components/Screenfull'
-import SizeSelect from '@/components/SizeSelect'
-import Search from '@/components/HeaderSearch'
+import { mapGetters } from 'vuex';
+import Breadcrumb from '@/components/Breadcrumb';
+import Hamburger from '@/components/Hamburger';
+import ErrorLog from '@/components/ErrorLog';
+import Screenfull from '@/components/Screenfull';
+import SizeSelect from '@/components/SizeSelect';
+import Search from '@/components/HeaderSearch';
 export default {
   components: {
     Breadcrumb,
@@ -73,15 +73,15 @@ export default {
   },
   methods: {
     toggleSideBar() {
-      this.$store.dispatch('app/toggleSideBar')
+      this.$store.dispatch('app/toggleSideBar');
     },
     async logout() {
-      await this.$store.dispatch('user/logout')
-      this.$router.push(`/login?redirect=${this.$route.fullPath}`)
-      this.$message.success('登出成功')
+      await this.$store.dispatch('user/logout');
+      this.$router.push(`/login?redirect=${this.$route.fullPath}`);
+      this.$message.success('登出成功');
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scoped>

@@ -1,4 +1,4 @@
-const { notEmpty } = require('../utils.js')
+const { notEmpty } = require('../utils.js');
 
 module.exports = {
   description: 'generate vue component',
@@ -30,14 +30,14 @@ module.exports = {
     ],
     validate(value) {
       if (value.indexOf('script') === -1 && value.indexOf('template') === -1) {
-        return 'Components require at least a <script> or <template> tag.'
+        return 'Components require at least a <script> or <template> tag.';
       }
-      return true
+      return true;
     }
   }
   ],
   actions: data => {
-    const name = '{{properCase name}}'
+    const name = '{{properCase name}}';
     const actions = [{
       type: 'add',
       path: `src/components/${name}/index.vue`,
@@ -48,8 +48,8 @@ module.exports = {
         script: data.blocks.includes('script'),
         style: data.blocks.includes('style')
       }
-    }]
+    }];
 
-    return actions
+    return actions;
   }
-}
+};
