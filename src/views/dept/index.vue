@@ -199,6 +199,7 @@ export default {
     this.test1()
   },
   methods: {
+
     test1() {
       const obj = { name: 'kljkklj' }
       this.test2(obj)
