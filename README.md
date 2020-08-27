@@ -8,5 +8,5 @@
 --> 
 技术栈：vue + axios + vue-router + vuex + element-ui
 
-项目类型：后台管理系统
+项目类型：权限管理后台系统
 
