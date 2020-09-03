@@ -22,7 +22,11 @@ const formUtil = (obj) => {
 export const deptTree = params => axios.post('/app/dept/tree', params);
 
 // 添加部门
-export const deptAdd = params => axios.post('/app/dept/add', params);
+export const deptAdd = params => axios({
+  method: 'post',
+  url: '/app/dept/add',
+  data: params
+});
 
 // 删除部门
 export const deptDel = params => axios({

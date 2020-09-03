@@ -56,18 +56,21 @@ service.interceptors.response.use(
     if (condition.includes(code)) {
       return res;
     } else if (code === 401) {
+      store.dispatch('user/logout');
       router.push({ path: '/login' });
       Message({
         message: '登录态失效',
         type: 'error',
         duration: 5 * 1000
       });
+      return Promise.reject();
     } else {
       Message({
         message: res.data.msg || 'Error',
         type: 'error',
         duration: 5 * 1000
       });
+      return Promise.reject();
     }
   },
   error => {

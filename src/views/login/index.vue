@@ -166,11 +166,15 @@ export default {
       this.$refs.loginForm.validate(async(valid) => {
         if (valid) {
           this.loading = true;
-          await this.$store.dispatch('user/login', this.loginForm);
-          await this.$store.dispatch('user/getUserInfo');
-          this.loading = false;
-          this.$router.push({ name: 'Dept' });
-          this.$message.success('你已登录');
+          try {
+            await this.$store.dispatch('user/login', this.loginForm);
+            await this.$store.dispatch('user/getUserInfo');
+            this.loading = false;
+            this.$router.push({ name: 'Dept' });
+            this.$message.success('你已登录');
+          } catch (e) {
+            this.loading = false;
+          }
         } else {
           console.log('error submit!!');
           return false;
