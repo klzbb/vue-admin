@@ -70,7 +70,7 @@ export const constantRoutes = [
         path: 'index',
         component: () => import('@/views/permission/index'),
         name: 'Permission',
-        meta: { title: '权限管理', icon: 'documentation', noCache: true }
+        meta: { title: '菜单管理', icon: 'documentation', noCache: true }
       }
     ]
   },

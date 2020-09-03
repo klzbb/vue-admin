@@ -2,64 +2,33 @@
   <div class="dept">
     <div class="dept_dept">
       <div class="dept_dept_label">
-        <span class="label">权限模块列表</span>
+        <span class="label">菜单管理列表</span>
         <i class="el-icon-circle-plus-outline" @click="addDept" />
       </div>
-      <el-tree
+      <el-table
         :data="tree"
-        show-checkbox
-        node-key="id"
-        :default-checked-keys="[]"
-        :props="defaultProps"
-        @node-click="nodeClick"
+        style="width: 100%;margin-bottom: 20px;"
+        row-key="id"
+        border
+        default-expand-all
+        :tree-props="defaultProps"
+        @selection-change="handleSelectionChange"
       >
-        <span slot-scope="{ node, data }" class="dept_dept_tree_item">
-          <span>{{ node.label }}</span>
-          <span>
-            <el-button type="text" size="mini" @click.stop="edit(data)">编辑</el-button>
-            <el-button type="text" size="mini" @click.stop="del(data)">删除</el-button>
-          </span>
-        </span>
-      </el-tree>
-    </div>
-    <div class="dept_user">
-      <div class="dept_user_label">
-        <span class="label">权限点列表</span>
-        <i class="el-icon-circle-plus-outline" @click="userAdd" />
-      </div>
-      <div class="dept_user_">
-        <el-table :data="userList" style="width: 100%">
-          <el-table-column prop="name" label="权限点名称" width="180" />
-
-          <el-table-column prop="acl_module_id" label="所属模块" width="180" />
-
-          <el-table-column prop="url" label="链接" width="180" />
-          <el-table-column prop="type" label="权限点类型" width="180">
-            <template slot-scope="scope">
-              {{ scope.row.type | v10001 }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="status" label="状态" width="180">
-            <template slot-scope="scope">
-              {{ scope.row.status === 1?"正常":"冻结" }}
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button type="text" size="small" @click="aclEdit(scope.row)">编辑</el-button>
-              <el-button type="text" size="small" @click="aclDel(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          :current-page.sync="pageNo"
-          :page-size="100"
-          layout="total, prev, pager, next"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+        <el-table-column
+          type="selection"
+          width="55"
         />
-      </div>
+        <el-table-column
+          prop="name"
+          label="名称"
+          sortable
+          width="180"
+        />
+        <el-table-column
+          prop="address"
+          label="地址"
+        />
+      </el-table>
     </div>
     <el-dialog width="800px" :modal-append-to-body="false" :title="title" :visible.sync="dialogFormVisible">
       <el-form ref="elForm" :model="form">
@@ -107,8 +76,8 @@
             @change="handleChange"
           />
         </el-form-item>
-        <el-form-item prop="name" label="权限点名称" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.name" placeholder="权限点名称" clearable autocomplete="off" />
+        <el-form-item prop="name" label="名称" :label-width="formLabelWidth">
+          <el-input v-model="aclForm.name" placeholder="名称" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="url" label="功能链接" :label-width="formLabelWidth">
           <el-input v-model="aclForm.url" placeholder="功能链接" clearable autocomplete="off" />
@@ -186,7 +155,7 @@ export default {
       tree: [],
       defaultProps: {
         children: 'aclModuleList',
-        label: 'name'
+        hasChildren: 'hasChildren'
       },
       dialogTableVisible: false,
       dialogFormVisible: false,
@@ -212,6 +181,9 @@ export default {
     this.init();
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
     },
@@ -393,7 +365,8 @@ export default {
       this.type = '2';
       this.form.status = 1;
       this.title = '添加权限模块';
-      this.dialogFormVisible = true;
+      // this.dialogFormVisible = true;
+      this.userVisible = true;
     },
     del(item) {
       this.$confirm('权限模块删除后将不可恢复，是否继续?', '提示', {
@@ -482,14 +455,13 @@ export default {
 };
 
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
   .dept {
     padding: 15px;
     position: relative;
 
     &_dept {
-      width: 350px;
-
+      // width: 350px;
       &_label {
         background-color: #409eff;
         color: #fff;

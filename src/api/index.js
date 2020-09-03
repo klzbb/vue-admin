@@ -74,34 +74,34 @@ export const logout = () => axios({
 
 // 权限模块树
 export const aclmoduleTree = () => axios({
-  url: '/app/aclmodule/tree',
+  url: '/app/menu/tree',
   method: 'post'
 });
 
 // 权限模块add
 export const aclmoduleAdd = params => axios({
-  url: '/app/aclmodule/add',
+  url: '/app/menu/add',
   method: 'post',
   data: formUtil(params)
 });
 
 // 权限模块update
 export const aclmoduleUpdate = params => axios({
-  url: '/app/aclmodule/update',
+  url: '/app/menu/update',
   method: 'post',
   data: formUtil(params)
 });
 
 // 权限模块level
 export const aclmoduleFindLevelById = params => axios({
-  url: '/app/aclmodule/findLevelById',
+  url: '/app/menu/findLevelById',
   method: 'post',
   data: formUtil(params)
 });
 
 // 权限模块delete
 export const aclmoduleDel = params => axios({
-  url: '/app/aclmodule/del',
+  url: '/app/menu/del',
   method: 'post',
   data: formUtil(params)
 });
