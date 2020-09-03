@@ -53,6 +53,7 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
+    redirect: '/dept',
     children: [
       {
         path: 'dept',

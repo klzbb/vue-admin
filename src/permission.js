@@ -16,13 +16,27 @@ import getPageTitle from '@/utils/get-page-title';
 
 NProgress.configure({ showSpinner: false }); // NProgress Configuration
 
-const whiteList = ['/login', '/auth-redirect']; // no redirect whitelist
+const whiteList = ['/login', '/auth-redirect']; // 白名单地址
 
 router.beforeEach(async(to, from, next) => {
   // start progress bar
   NProgress.start();
+  const { loginStatus } = store.getters;
   store.commit('permission/SET_ROUTES', []);
-  next();
+  if (loginStatus === '0') {
+    if (whiteList.indexOf(to.path) !== -1) {
+      next();
+    } else {
+      next(`/login?redirect=${to.path}`);
+      NProgress.done();
+    }
+  } else {
+    if (to.path === '/login') {
+      next({ path: '/' });
+    } else {
+      next();
+    }
+  }
   // // set page title
   // document.title = getPageTitle(to.meta.title)
 
