@@ -65,7 +65,7 @@ export const delUserById = (params) => axios({
 
 // 登录
 export const login = params => axios({
-  url: '/app/user/login',
+  url: '/app/login',
   method: 'post',
   data: formUtil(params)
 });
