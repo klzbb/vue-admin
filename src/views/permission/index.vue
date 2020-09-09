@@ -3,7 +3,7 @@
     <div class="dept_dept">
       <div class="dept_dept_label">
         <span class="label">菜单管理列表</span>
-        <i class="el-icon-circle-plus-outline" @click="addDept" />
+        <i class="el-icon-circle-plus-outline" @click="addMenu" />
       </div>
       <el-table
         :data="tree"
@@ -25,46 +25,12 @@
           width="180"
         />
         <el-table-column
-          prop="address"
+          prop="url"
           label="地址"
         />
       </el-table>
     </div>
-    <el-dialog width="800px" :modal-append-to-body="false" :title="title" :visible.sync="dialogFormVisible">
-      <el-form ref="elForm" :model="form">
-        <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
-          <el-cascader
-            v-model="value"
-            :clearable="true"
-            :options="deptList"
-            :props="cascaderProps"
-            placeholder="请选择上级模块"
-            @change="handleChange"
-          />
-        </el-form-item>
-        <el-form-item prop="name" label="名称" :label-width="formLabelWidth">
-          <el-input v-model="form.name" :clearable="true" autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="seq" label="顺序" :label-width="formLabelWidth">
-          <el-input v-model="form.seq" :clearable="true" autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
-          <el-select v-model="form.status" placeholder="状态" clearable>
-            <el-option :value="0" label="禁用" />
-            <el-option :value="1" label="正常" />
-          </el-select>
-        </el-form-item>
-        <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
-          <el-input v-model="form.remark" :clearable="true" autocomplete="off" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="sure">确 定</el-button>
-      </div>
-    </el-dialog>
-
-    <el-dialog width="800px" :modal-append-to-body="false" :title="aclTitle" :visible.sync="userVisible">
+    <el-dialog width="800px" :modal-append-to-body="false" :title="title" :visible.sync="isShowMenuDialog">
       <el-form ref="aclForm" :model="aclForm">
         <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
           <el-cascader
@@ -103,8 +69,8 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="userVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submit">确 定</el-button>
+        <el-button @click="isShowMenuDialog = false">取 消</el-button>
+        <el-button type="primary" @click="sure">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -134,12 +100,11 @@ export default {
       pageSize: 10,
       userList: [],
       total: 0,
-      aclTitle: '添加用户',
-      userVisible: false,
+      isShowMenuDialog: false,
       aclCasValue: [],
       aclForm: {
         name: '',
-        aclModuleId: '',
+        parent_id: 0,
         url: '',
         type: '',
         status: 1,
@@ -223,7 +188,7 @@ export default {
       this.aclCasValue = [8, 9];
       // this.aclCasValue = await this.getLevel(row.acl_module_id)
       console.log(this.aclCasValue);
-      this.userVisible = true;
+      this.isShowMenuDialog = true;
     },
     async getLevel(aclModuleId) {
       const res = await aclmoduleFindLevelById({ aclModuleId });
@@ -281,92 +246,86 @@ export default {
       this.aclForm = {};
       this.aclCasValue = [];
       this.aclTitle = '添加权限点';
-      this.userVisible = true;
+      this.isShowMenuDialog = true;
     },
-    async submit() {
+    /**
+     * 提交按钮
+     */
+    async sure() {
+      if (this.type === '2') {
+        this.createMenu();
+      } else if (this.type === '1') {
+        this.updateMenu();
+      }
+    },
+    /**
+     * 创建菜单
+     */
+    async createMenu() {
       const len = this.aclCasValue.length - 1;
-      this.aclForm.aclModuleId = this.aclCasValue[len];
+      this.aclForm.parent_id = this.aclCasValue[len];
       const {
+        parent_id: parentId,
         name,
-        aclModuleId,
+        seq,
         url,
         type,
         status,
-        seq,
         remark
       } = this.aclForm;
-
-      const res = await aclAdd({
+      const res = await aclmoduleAdd({
+        parentId: parentId || 0,
         name,
-        aclModuleId,
+        seq,
         url,
         type,
         status,
-        seq,
         remark
       });
       if (res && res.data.code === 0) {
-        this.userVisible = false;
-        this.$message.success('权限点新增成功');
-        if (this.aclModuleId) this.selectAclListByAclModuleId(this.aclModuleId);
+        this.aclForm = {};
+        this.isShowMenuDialog = false;
+        this.$message.success('添加菜单成功');
+        this.init();
       }
     },
-    async sure() {
-      if (this.type === '2') {
-        const len = this.value.length - 1;
-        this.form.parent_id = this.value[len];
-        const {
-          parent_id: parentId,
-          name,
-          seq,
-          status,
-          remark
-        } = this.form;
-        const res = await aclmoduleAdd({
-          parentId,
-          name,
-          seq,
-          status,
-          remark
-        });
-        if (res && res.data.code === 0) {
-          this.form = {};
-          this.dialogFormVisible = false;
-          this.$message.success('添加权限模块成功');
-          this.init();
-        }
-      } else if (this.type === '1') {
-        const {
-          parent_id: parentId,
-          name,
-          seq,
-          status,
-          remark,
-          id
-        } = this.form;
-        const updateRes = await aclmoduleUpdate({
-          parentId,
-          name,
-          seq,
-          status,
-          remark,
-          id
-        });
-        if (updateRes && updateRes.data.code === 0) {
-          this.form = {};
-          this.dialogFormVisible = false;
-          this.$message.success('更新权限模块成功');
-          this.init();
-        }
+    /**
+     * 更新菜单
+     */
+    async updateMenu() {
+      const {
+        parent_id: parentId,
+        name,
+        seq,
+        url,
+        type,
+        status,
+        remark,
+        id
+      } = this.aclForm;
+      const updateRes = await aclmoduleUpdate({
+        parentId: parentId || 0,
+        name,
+        seq,
+        url,
+        type,
+        status,
+        remark,
+        id
+      });
+      if (updateRes && updateRes.data.code === 0) {
+        this.aclForm = {};
+        this.isShowMenuDialog = false;
+        this.$message.success('添加菜单成功');
+        this.init();
       }
     },
     handleChange(value) {},
-    addDept() {
+    addMenu() {
       this.type = '2';
       this.form.status = 1;
-      this.title = '添加权限模块';
-      // this.dialogFormVisible = true;
-      this.userVisible = true;
+      this.title = '添加菜单';
+      this.isShowMenuDialog = true;
     },
     del(item) {
       this.$confirm('权限模块删除后将不可恢复，是否继续?', '提示', {
@@ -461,7 +420,7 @@ export default {
     position: relative;
 
     &_dept {
-      // width: 350px;
+      width: 100%;
       &_label {
         background-color: #409eff;
         color: #fff;

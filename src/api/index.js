@@ -72,7 +72,7 @@ export const login = params => axios({
 
 // 登出
 export const logout = () => axios({
-  url: '/app/user/logout',
+  url: '/app/logout',
   method: 'get'
 });
 
