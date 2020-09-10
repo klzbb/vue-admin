@@ -175,3 +175,10 @@ export const roleTree = (params) => axios({
   method: 'post',
   data: formUtil(params)
 });
+
+// 保存角色权限菜单
+export const roleMenuSave = (params) => axios({
+  url: '/app/roleMenu/save',
+  method: 'post',
+  data: formUtil(params)
+});

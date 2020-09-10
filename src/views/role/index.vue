@@ -35,8 +35,9 @@
         <el-menu-item index="1">角色与权限</el-menu-item>
         <el-menu-item index="4">角色与用户</el-menu-item>
       </el-menu>
-      <div class="dept_user_">
+      <div class="dept_user_user">
         <el-tree
+          ref="tree"
           :data="roleAclList"
           show-checkbox
           node-key="id"
@@ -51,6 +52,7 @@
             </span>
           </span>
         </el-tree>
+        <el-button type="primary" @click="saveRoleMenu">保存</el-button>
       </div>
     </div>
     <el-dialog
@@ -131,6 +133,7 @@
 </template>
 <script>
 import {
+  roleMenuSave,
   roleAdd,
   roleUpdate,
   roleList,
@@ -154,6 +157,7 @@ export default {
   name: 'Role',
   data() {
     return {
+      roleId: '',
       activeIndex: '1',
       activeIndex2: '1',
 
@@ -216,11 +220,22 @@ export default {
     this.init();
   },
   methods: {
+    async saveRoleMenu() {
+      const self = this;
+      const menuIds = self.$refs.tree.getCheckedNodes().map(item => item.id).join(',');
+      const params = {
+        menuIds: menuIds,
+        roleId: self.roleId
+      };
+      const res = await roleMenuSave(params);
+      if (res && res.data.code === 0) {
+        this.$message.success('保存成功');
+      }
+    },
     leafFn(data, node) {
       if (data.aclModuleList) {
         data.aclModuleList = data.aclModuleList.concat(data.aclList);
       }
-      // debugger;
     },
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
@@ -298,6 +313,7 @@ export default {
       return result;
     },
     nodeClick(data) {
+      this.roleId = data.id;
       this.selectAclListByAclModuleId(data.id);
     },
     async selectAclListByAclModuleId(roleId) {
