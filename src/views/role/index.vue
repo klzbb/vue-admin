@@ -7,7 +7,6 @@
       </div>
       <el-tree
         :data="tree"
-        show-checkbox
         node-key="id"
         :default-checked-keys="[]"
         :props="defaultProps"
@@ -24,7 +23,7 @@
     </div>
     <div class="dept_user">
       <el-menu
-        :default-active="activeIndex2"
+        :default-active="activeIndex"
         class="el-menu-demo"
         mode="horizontal"
         background-color="#409eff"
@@ -33,7 +32,7 @@
         @select="handleSelect"
       >
         <el-menu-item index="1">角色与权限</el-menu-item>
-        <el-menu-item index="4">角色与用户</el-menu-item>
+        <el-menu-item index="2">角色与用户</el-menu-item>
       </el-menu>
       <div class="dept_user_user">
         <el-tree
@@ -41,7 +40,7 @@
           :data="roleAclList"
           show-checkbox
           node-key="id"
-          :default-checked-keys="[]"
+          :default-checked-keys="checkedArr"
           :props="roleAclProps"
         >
           <span slot-scope="{ node, data }" class="dept_dept_tree_item">
@@ -52,7 +51,7 @@
             </span>
           </span>
         </el-tree>
-        <el-button type="primary" @click="saveRoleMenu">保存</el-button>
+        <el-button v-if="activeIndex === '1'" type="primary" @click="saveRoleMenu">保存</el-button>
       </div>
     </div>
     <el-dialog
@@ -159,8 +158,7 @@ export default {
     return {
       roleId: '',
       activeIndex: '1',
-      activeIndex2: '1',
-
+      checkedArr: [],
       aclModuleId: '',
       pageNo: 1,
       pageSize: 10,
@@ -191,7 +189,7 @@ export default {
       },
       roleAclProps: {
         isLeaf: this.leafFn,
-        children: 'aclModuleList',
+        children: 'children',
         label: 'name'
       },
       dialogTableVisible: false,
@@ -321,8 +319,27 @@ export default {
         roleId
       });
       if (res && res.data.code === 0) {
-        this.roleAclList = res.data.data;
+        const list = res.data.data;
+        this.roleAclList = list;
+        this.checkedArr = this.deepForChecked(list);
       }
+    },
+    /**
+     * 递归树状结构获取选中节点
+     * @return{Array} result
+     */
+    deepForChecked(data) {
+      const result = [];
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].checked === true) {
+          result.push(data[i].id);
+        }
+
+        if (data[i].children.length > 0) {
+          this.deepForChecked(data[i].children);
+        }
+      }
+      return result;
     },
     userAdd() {
       this.aclForm = {};

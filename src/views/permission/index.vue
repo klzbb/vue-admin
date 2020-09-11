@@ -119,7 +119,7 @@ export default {
       options: [],
       tree: [],
       defaultProps: {
-        children: 'aclModuleList',
+        children: 'children',
         hasChildren: 'hasChildren'
       },
       dialogTableVisible: false,
@@ -397,15 +397,18 @@ export default {
       const result = arr.concat(list);
       return result;
     },
-    // 递归判断列表，把最后的children设为undefined
+    /**
+     * 递归树状结构将children为([])空时，变为undefined
+     * @return{Array} data
+     */
     getTreeData(data) {
       for (var i = 0; i < data.length; i++) {
-        if (data[i].aclModuleList.length < 1) {
+        if (data[i].children.length < 1) {
           // children若为空数组，则将children设为undefined
-          data[i].aclModuleList = undefined;
+          data[i].children = undefined;
         } else {
           // children若不为空数组，则继续 递归调用 本方法
-          this.getTreeData(data[i].aclModuleList);
+          this.getTreeData(data[i].children);
         }
       }
       return data;

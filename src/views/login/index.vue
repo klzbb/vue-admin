@@ -168,7 +168,6 @@ export default {
           this.loading = true;
           try {
             await this.$store.dispatch('user/login', this.loginForm);
-            await this.$store.dispatch('user/getUserInfo');
             this.loading = false;
             this.$router.push({ name: 'Dept' });
             this.$message.success('你已登录');

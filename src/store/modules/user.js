@@ -30,6 +30,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       login({ username: username.trim(), password: password }).then(response => {
         commit('SET_LOGIN_STATUS', '1');
+        commit('SET_USER_INFO', response.data.data.user); // 保存用户数据
         resolve(response);
       }).catch(error => {
         reject(error);
