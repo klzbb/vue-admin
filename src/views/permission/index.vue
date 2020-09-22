@@ -137,7 +137,7 @@ export default {
         checkStrictly: true,
         value: 'id',
         expandTrigger: 'hover',
-        children: 'aclModuleList',
+        children: 'children',
         label: 'name'
       }
     };

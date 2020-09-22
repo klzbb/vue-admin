@@ -63,14 +63,14 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       });
-      return Promise.reject();
+      return Promise.reject(res.data.code);
     } else {
       Message({
         message: res.data.msg || 'Error',
         type: 'error',
         duration: 5 * 1000
       });
-      return Promise.reject();
+      return Promise.reject(res.data.code);
     }
   },
   error => {

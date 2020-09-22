@@ -88,6 +88,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/user',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/user/index.vue'),
+        name: 'UserList',
+        meta: { title: '用户管理', icon: 'documentation', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/login',
     component: () => import('@/views/login/index'),
     hidden: true
