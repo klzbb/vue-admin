@@ -104,7 +104,7 @@ export const aclmoduleFindLevelById = params => axios({
 });
 
 // 权限模块delete
-export const aclmoduleDel = params => axios({
+export const menuDel = params => axios({
   url: '/app/menu/del',
   method: 'post',
   data: formUtil(params)

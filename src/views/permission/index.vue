@@ -24,10 +24,36 @@
           sortable
           width="180"
         />
+
+        <el-table-column
+          prop="type"
+          label="类型"
+          width="80"
+        >
+          <template slot-scope="scope">
+            <div>{{ scope.row.type === 1 ? '菜单' : scope.row.type === 2 ? '按钮' : '其他' }}</div>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="seq"
+          label="顺序"
+          width="80"
+        />
         <el-table-column
           prop="url"
-          label="地址"
+          label="功能链接"
         />
+        <el-table-column
+          prop="seq"
+          label="操作"
+          fixed="right"
+          width="200"
+        >
+          <template slot-scope="scope">
+            <el-button type="primary" @click="editMenu(scope.row)">编辑</el-button>
+            <el-button type="danger" @click="delMenu(scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
     <el-dialog width="800px" :modal-append-to-body="false" :title="title" :visible.sync="isShowMenuDialog">
@@ -78,7 +104,7 @@
 <script>
 import {
   aclmoduleTree,
-  aclmoduleDel,
+  menuDel,
   aclmoduleAdd,
   aclmoduleUpdate,
   aclAdd,
@@ -101,7 +127,7 @@ export default {
       userList: [],
       total: 0,
       isShowMenuDialog: false,
-      aclCasValue: [],
+      aclCasValue: [0, 5],
       aclForm: {
         name: '',
         parent_id: 0,
@@ -141,6 +167,11 @@ export default {
         label: 'name'
       }
     };
+  },
+  watch: {
+    aclCasValue(cur, old) {
+      console.log(cur);
+    }
   },
   mounted() {
     this.init();
@@ -293,6 +324,8 @@ export default {
      * 更新菜单
      */
     async updateMenu() {
+      const len = this.aclCasValue.length - 1;
+      this.aclForm.parent_id = this.aclCasValue[len];
       const {
         parent_id: parentId,
         name,
@@ -316,7 +349,7 @@ export default {
       if (updateRes && updateRes.data.code === 0) {
         this.aclForm = {};
         this.isShowMenuDialog = false;
-        this.$message.success('添加菜单成功');
+        this.$message.success('更新菜单成功');
         this.init();
       }
     },
@@ -327,15 +360,34 @@ export default {
       this.title = '添加菜单';
       this.isShowMenuDialog = true;
     },
-    del(item) {
-      this.$confirm('权限模块删除后将不可恢复，是否继续?', '提示', {
+    editMenu(row) {
+      this.type = '1';
+      this.aclForm = { ...row };
+      this.aclCasValue = this.levelToArr(row.level);
+      this.title = '编辑菜单';
+      this.isShowMenuDialog = true;
+    },
+    levelToArr(level) {
+      let result;
+      if (level.indexOf('.') === -1) {
+        result = [level];
+      } else {
+        result = level.split('.');
+      }
+      result.shift();
+      result = result.map(item => parseInt(item));
+      console.log(result);
+      return result;
+    },
+    delMenu(row) {
+      this.$confirm('当您点击确定按钮后，这些记录将会被彻底删除，如果其包含子记录，也将一并删除！', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(async() => {
-          const res = await aclmoduleDel({
-            id: item.id
+          const res = await menuDel({
+            id: row.id
           });
           if (res && res.data.code === 0) {
             this.$message.success('删除成功');
