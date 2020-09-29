@@ -96,3 +96,26 @@ export function v10001(type) {
   }
   return text;
 }
+
+/**
+ * 用户状态
+ * @param {Number} status
+ */
+export function v10002(status) {
+  let text;
+  switch (status) {
+    case 0:
+      text = '无效';
+      break;
+    case 1:
+      text = '正常';
+      break;
+    case 2:
+      text = '冻结';
+      break;
+    default:
+      break;
+  }
+  return text;
+}
+

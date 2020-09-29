@@ -19,13 +19,17 @@ const formUtil = (obj) => {
 };
 
 // 部门树
-export const deptTree = params => axios.post('/app/dept/tree', params);
+export const deptTree = params => axios({
+  method: 'post',
+  url: '/app/dept/tree',
+  data: params
+});
 
 // 添加部门
 export const deptAdd = params => axios({
   method: 'post',
   url: '/app/dept/add',
-  data: params
+  data: formUtil(params)
 });
 
 // 删除部门
@@ -54,6 +58,12 @@ export const userList = (params) => axios({
   url: '/app/user/list',
   method: 'post',
   data: formUtil(params)
+});
+
+// 所有用户
+export const userAll = () => axios({
+  url: '/app/userAll',
+  method: 'post'
 });
 
 // 用户删除

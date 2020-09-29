@@ -166,7 +166,7 @@ export default {
       title: '添加部门',
       currentDept: {},
       deptList: [],
-      value: [],
+      value: [0],
       options: [],
       tree: [],
       defaultProps: {

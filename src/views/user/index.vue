@@ -1,15 +1,285 @@
 <template>
   <div class="user">
-    用户管理
+    <div class="user_search">
+      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item>
+          <el-button type="primary" @click="drawer = true">新增</el-button>
+        </el-form-item>
+        <el-form-item label="用户姓名">
+          <el-input v-model="formInline.user" clearable placeholder="用户姓名" />
+        </el-form-item>
+        <el-form-item label="手机号码">
+          <el-input v-model="formInline.user" clearable placeholder="手机号码" />
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="userSearch">查询</el-button>
+        </el-form-item>
+      </el-form>
+    </div>
+    <el-table
+      :data="userList"
+      border
+      style="width: 100%"
+    >
+      <el-table-column
+        fixed
+        prop="username"
+        label="用户名称"
+        width="150"
+      />
+      <el-table-column
+        prop="telephone"
+        label="手机号码"
+        width="120"
+      />
+      <el-table-column
+        prop="mail"
+        label="邮箱"
+        width="200"
+      />
+      <el-table-column
+        prop="deptName"
+        label="部门名称"
+        width="120"
+      />
+      <el-table-column
+        prop="status"
+        label="用户状态"
+        width="100"
+      >
+        <div slot-scope="scope">
+          {{ scope.row.status | v10002 }}
+        </div>
+      </el-table-column>
+      <el-table-column
+        prop="remark"
+        label="备注"
+      />
+      <el-table-column
+        fixed="right"
+        label="操作"
+        width="200"
+      >
+        <template slot-scope="scope">
+          <el-button type="primary" @click="editUser(scope.row)">编辑</el-button>
+          <el-button type="danger" @click="delUser(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-drawer
+      title="标题"
+      :visible.sync="drawer"
+      :with-header="false"
+    >
+      <div class="user_form">
+        <div class="user_form_title">{{ title }}</div>
+        <el-form ref="form" :model="form" label-width="80px">
+          <el-form-item label="用户名称">
+            <el-input v-model="form.username" clearable placeholder="请填写用户名称" />
+          </el-form-item>
+          <el-form-item label="手机号码">
+            <el-input v-model="form.telephone" clearable placeholder="请填写用户名称" />
+          </el-form-item>
+          <el-form-item label="邮箱号码">
+            <el-input v-model="form.mail" clearable placeholder="请填写用户名称" />
+          </el-form-item>
+          <el-form-item label="账号密码">
+            <el-input v-model="form.password" type="password" clearable placeholder="请填写用户名称" />
+          </el-form-item>
+          <el-form-item label="部门">
+            <el-cascader
+              v-model="deptValue"
+              clearable
+              :options="deptTreeList"
+              :props="deptProps"
+              placeholder="请选择部门"
+              @change="handleChange"
+            />
+          </el-form-item>
+          <el-form-item label="用户状态">
+            <el-select v-model="form.status" clearable placeholder="请选择用户状态">
+              <el-option label="无效" :value="0" />
+              <el-option label="正常" :value="1" />
+              <el-option label="冻结" :value="2" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="备注">
+            <el-input v-model="form.remark" clearable type="textarea" />
+          </el-form-item>
+          <el-form-item>
+            <el-button>取消</el-button>
+            <el-button type="primary" @click="submit">确定</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+
+    </el-drawer>
   </div>
 </template>
+
 <script>
+import {
+  deptTree,
+  register,
+  userAll,
+  userList,
+  delUserById
+} from '@/api/index.js';
 export default {
-  name: 'UserList'
+  name: 'UserList',
+  data() {
+    return {
+      userList: [],
+      deptProps: {
+        children: 'deptList',
+        label: 'name',
+        value: 'id'
+      },
+      deptTreeList: [],
+      options: [],
+      deptValue: '',
+      title: '新增用户',
+      formInline: {
+        user: '',
+        region: ''
+      },
+      form: {
+        type: '1', // 表单类型 1-新增 2-编辑
+        username: '',
+        password: '123444',
+        telephone: '',
+        mail: '',
+        deptId: '',
+        status: 1,
+        remark: ''
+      },
+      drawer: false
+    };
+  },
+  watch: {
+    deptValue(cur, old) {
+      console.log(cur);
+    }
+  },
+  mounted() {
+    this.init();
+  },
+  methods: {
+    userSearch() {
+
+    },
+    async deptTree() {
+      const res = await deptTree();
+      if (res && res.data.code === 0) {
+        const tree = res.data.data;
+        this.deptTreeList = this.getTreeData(tree);
+        return res;
+      }
+    },
+    // 递归判断列表，把最后的children设为undefined
+    getTreeData(data) {
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].deptList.length < 1) {
+          data[i].deptList = undefined;
+        } else {
+          this.getTreeData(data[i].deptList);
+        }
+      }
+      return data;
+    },
+    handleChange(value) {
+      console.log(value);
+    },
+    async submit() {
+      const len = this.deptValue.length - 1;
+      this.form.deptId = this.deptValue[len];
+      const { username, telephone, password, mail, status, remark, deptId } = this.form;
+      const res = await register({
+        username,
+        telephone,
+        password,
+        mail,
+        status,
+        remark,
+        deptId
+      });
+      if (res && res.data.code === 0) {
+        this.drawer = false;
+        this.$message.success('用户注册成功');
+        this.init();
+      }
+    },
+    async userAll() {
+      const res = await userAll();
+      if (res && res.data.code === 0) {
+        this.userList = res.data.data;
+        return res;
+      }
+    },
+    editUser(row) {
+      this.title = '编辑用户';
+      this.drawer = true;
+      this.form = { ...row };
+    },
+    delUser(row) {
+      const { id } = row;
+      this.$confirm('用户删除后将不可恢复，是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(async() => {
+          const res = await delUserById({
+            id
+          });
+          if (res && res.data.code === 0) {
+            this.$message.success('删除成功');
+            this.init();
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });
+        });
+    },
+    init() {
+      Promise.all([this.deptTree(), this.userAll()])
+        .then(res => {
+
+        })
+        .catch(e => {
+          console.log(e);
+        });
+    }
+  }
 };
 </script>
+
 <style lang="scss">
 .user{
   padding:15px;
+  &_form{
+    padding:0 10px 20px;
+    &_title{
+      margin-bottom: 20px;
+      position: relative;
+      line-height: 60px;
+    }
+    &_title:after{
+      content:'';
+      width: 576px;
+      height: 1px;
+      background-color: #eee;
+      position: absolute;
+      bottom: 0;
+      left: -10px;
+    }
+  }
+  .el-select,
+  .el-cascader{
+    display:block;
+  }
 }
 </style>
