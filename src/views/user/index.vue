@@ -78,13 +78,13 @@
             <el-input v-model="form.username" clearable placeholder="请填写用户名称" />
           </el-form-item>
           <el-form-item label="手机号码">
-            <el-input v-model="form.telephone" clearable placeholder="请填写用户名称" />
+            <el-input v-model="form.telephone" clearable placeholder="请填写手机号码" />
           </el-form-item>
           <el-form-item label="邮箱号码">
-            <el-input v-model="form.mail" clearable placeholder="请填写用户名称" />
+            <el-input v-model="form.mail" clearable placeholder="请填写邮箱号码" />
           </el-form-item>
-          <el-form-item label="账号密码">
-            <el-input v-model="form.password" type="password" clearable placeholder="请填写用户名称" />
+          <el-form-item v-if="form.type === '1'" label="账号密码">
+            <el-input v-model="form.password" type="password" clearable placeholder="请填写账号密码" />
           </el-form-item>
           <el-form-item label="部门">
             <el-cascader
@@ -107,7 +107,7 @@
             <el-input v-model="form.remark" clearable type="textarea" />
           </el-form-item>
           <el-form-item>
-            <el-button>取消</el-button>
+            <el-button @click="drawer = false">取消</el-button>
             <el-button type="primary" @click="submit">确定</el-button>
           </el-form-item>
         </el-form>
@@ -144,6 +144,7 @@ export default {
         region: ''
       },
       form: {
+        id: '',
         type: '1', // 表单类型 1-新增 2-编辑
         username: '',
         password: '123444',
@@ -191,6 +192,14 @@ export default {
       console.log(value);
     },
     async submit() {
+      const { type } = this.form;
+      if (type === '1') {
+        this.register();
+      } else if (type === '2') {
+
+      }
+    },
+    async register() {
       const len = this.deptValue.length - 1;
       this.form.deptId = this.deptValue[len];
       const { username, telephone, password, mail, status, remark, deptId } = this.form;
