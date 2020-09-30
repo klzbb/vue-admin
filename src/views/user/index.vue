@@ -3,7 +3,7 @@
     <div class="user_search">
       <el-form :inline="true" :model="formInline" class="demo-form-inline">
         <el-form-item>
-          <el-button type="primary" @click="drawer = true">新增</el-button>
+          <el-button type="primary" @click="userAdd">新增</el-button>
         </el-form-item>
         <el-form-item label="用户姓名">
           <el-input v-model="formInline.user" clearable placeholder="用户姓名" />
@@ -66,6 +66,13 @@
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination
+      :current-page.sync="pageNo"
+      :page-size="pageSize"
+      layout="total, prev, pager, next"
+      :total="total"
+      @current-change="handleCurrentChange"
+    />
     <el-drawer
       title="标题"
       :visible.sync="drawer"
@@ -129,6 +136,9 @@ export default {
   name: 'UserList',
   data() {
     return {
+      total: 0,
+      pageNo: 1,
+      pageSize: 15,
       userList: [],
       deptProps: {
         children: 'deptList',
@@ -166,6 +176,14 @@ export default {
     this.init();
   },
   methods: {
+    handleCurrentChange(val) {
+      this.pageNo = val;
+      this.userAll();
+    },
+    userAdd() {
+      this.title = '新增用户';
+      this.drawer = true;
+    },
     userSearch() {
 
     },
@@ -219,9 +237,10 @@ export default {
       }
     },
     async userAll() {
-      const res = await userAll();
+      const res = await userAll({ pageNo: this.pageNo, pageSize: this.pageSize });
       if (res && res.data.code === 0) {
-        this.userList = res.data.data;
+        this.userList = res.data.data.data;
+        this.total = res.data.data.total;
         return res;
       }
     },
@@ -289,6 +308,11 @@ export default {
   .el-select,
   .el-cascader{
     display:block;
+  }
+  .el-pagination{
+    text-align:right;
+    margin-top: 20px;
+    padding-right: 50px;
   }
 }
 </style>

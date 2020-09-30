@@ -61,9 +61,10 @@ export const userList = (params) => axios({
 });
 
 // 所有用户
-export const userAll = () => axios({
+export const userAll = (params) => axios({
   url: '/app/userAll',
-  method: 'post'
+  method: 'post',
+  data: formUtil(params)
 });
 
 // 用户删除

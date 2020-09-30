@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+
+<body>
+  <p>33333333</p>
+  <script>
+    const a = {
+      age: "konglingzhan",
+      test: function () {
+        console.log(this.test.name)
+        console.log("start test")
+        console.log(this.name)
+        throw new Error("test error")
+        console.log("end")
+      }
+    }
+    function t() {
+      console.log(t.name)
+      debugger;
+      try {
+        a.test();
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    t();
+  </script>
+</body>
+
+</html>
