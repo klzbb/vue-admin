@@ -1,7 +1,7 @@
 <template>
-  <div class="dept">
-    <div class="dept_dept">
-      <div class="dept_dept_label">
+  <div class="role">
+    <div class="role_dept">
+      <div class="role_dept_label">
         <span class="label">角色列表</span>
         <i class="el-icon-circle-plus-outline" @click="addDept" />
       </div>
@@ -12,7 +12,7 @@
         :props="defaultProps"
         @node-click="nodeClick"
       >
-        <span slot-scope="{ node, data }" class="dept_dept_tree_item">
+        <span slot-scope="{ node, data }" class="role_dept_tree_item">
           <span>{{ node.label }}</span>
           <span>
             <el-button type="text" size="mini" @click.stop="edit(data)">编辑</el-button>
@@ -21,7 +21,7 @@
         </span>
       </el-tree>
     </div>
-    <div class="dept_user">
+    <div class="role_user">
       <el-menu
         :default-active="activeIndex"
         class="el-menu-demo"
@@ -34,7 +34,7 @@
         <el-menu-item index="1">角色与权限</el-menu-item>
         <el-menu-item index="2">角色与用户</el-menu-item>
       </el-menu>
-      <div class="dept_user_user">
+      <div class="role_user_user">
         <el-tree
           ref="tree"
           :data="roleAclList"
@@ -43,7 +43,7 @@
           :default-checked-keys="checkedArr"
           :props="roleAclProps"
         >
-          <span slot-scope="{ node, data }" class="dept_dept_tree_item">
+          <span slot-scope="{ node, data }" class="role_dept_tree_item">
             <span>{{ node.label }}</span>
             <span>
               <el-button type="text" size="mini" @click.stop="edit(data)">编辑</el-button>
@@ -482,7 +482,7 @@ export default {
 };
 </script>
 <style lang="scss">
-.dept {
+.role {
   padding: 15px;
   position: relative;
 

@@ -5,51 +5,42 @@
         <span class="label">部门列表</span>
         <i class="el-icon-circle-plus-outline" @click="addDept" />
       </div>
-      <el-tree
+
+      <el-table
         :data="tree"
-        show-checkbox
-        node-key="id"
-        :default-checked-keys="[]"
-        :props="defaultProps"
-        @node-click="nodeClick"
+        style="width: 100%;margin-bottom: 20px;"
+        row-key="id"
+        border
+        default-expand-all
+        :tree-props="defaultProps"
+        @selection-change="handleSelectionChange"
       >
-        <span slot-scope="{ node, data }" class="dept_dept_tree_item">
-          <span>{{ node.label }}</span>
-          <span>
-            <el-button type="text" size="mini" @click.stop="edit(data)">编辑</el-button>
-            <el-button type="text" size="mini" @click.stop="del(data)">删除</el-button>
-          </span>
-        </span>
-      </el-tree>
-    </div>
-    <div class="dept_user">
-      <div class="dept_user_label">
-        <span class="label">用户列表</span>
-        <i class="el-icon-circle-plus-outline" @click="userAdd" />
-      </div>
-      <div class="dept_user_">
-        <el-table :data="userList" style="width: 100%">
-          <el-table-column prop="username" label="姓名" width="180" />
-          <el-table-column prop="dept_id" label="所属部门" width="180" />
-          <el-table-column prop="mail" label="邮箱" width="180" />
-          <el-table-column prop="telephone" label="电话" width="180" />
-          <el-table-column prop="status" label="状态" width="180" />
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button type="text" size="small" @click="userEdit(scope.row)">编辑</el-button>
-              <el-button type="text" size="small" @click="userDel(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          :current-page.sync="pageNo"
-          :page-size="100"
-          layout="total, prev, pager, next"
-          :total="total"
-          @size-change="handleSizeChange"
-          @current-change="handleCurrentChange"
+        <el-table-column
+          type="selection"
+          width="55"
         />
-      </div>
+        <el-table-column
+          prop="name"
+          label="名称"
+          sortable
+          width="180"
+        />
+        <el-table-column
+          prop="seq"
+          label="顺序"
+        />
+        <el-table-column
+          prop="seq"
+          label="操作"
+          fixed="right"
+          width="200"
+        >
+          <template slot-scope="scope">
+            <el-button type="primary" @click="edit(scope.row)">编辑</el-button>
+            <el-button type="danger" @click="del(scope.row)">删除</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
     </div>
     <el-dialog
       width="800px"
@@ -406,14 +397,12 @@ export default {
   }
 };
 </script>
-<style lang="scss">
+<style lang="scss" scoped>
 .dept {
   padding: 15px;
   position: relative;
 
   &_dept {
-    width: 350px;
-
     &_label {
       background-color: #409eff;
       color: #fff;
