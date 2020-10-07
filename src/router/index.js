@@ -88,6 +88,18 @@ export const constantRoutes = [
     ]
   },
   {
+    path: '/role2',
+    component: Layout,
+    children: [
+      {
+        path: 'index2',
+        component: () => import('@/views/role/index2'),
+        name: 'Role2',
+        meta: { title: '角色管理2', icon: 'documentation', noCache: true }
+      }
+    ]
+  },
+  {
     path: '/user',
     component: Layout,
     children: [
