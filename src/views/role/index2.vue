@@ -54,7 +54,7 @@
       >
         <template slot-scope="scope">
           <el-button type="primary" @click="editRole(scope.row)">编辑</el-button>
-          <el-button type="danger" @click="delUser(scope.row)">删除</el-button>
+          <el-button type="danger" @click="delRole(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -100,6 +100,9 @@
 <script>
 import {
   roleList,
+  roleAdd,
+  roleDel,
+  roleUpdate,
   deptTree,
   register,
   userAll,
@@ -110,6 +113,7 @@ export default {
   name: 'Role2',
   data() {
     return {
+      type: '1',
       list: [],
       total: 0,
       pageNo: 1,
@@ -130,12 +134,7 @@ export default {
       },
       form: {
         id: '',
-        type: '1', // 表单类型 1-新增 2-编辑
         name: '',
-        password: '123444',
-        telephone: '',
-        mail: '',
-        deptId: '',
         status: 1,
         remark: ''
       },
@@ -151,7 +150,21 @@ export default {
     this.init();
   },
   methods: {
-
+    async submit() {
+      if (this.type === '2') {
+        const res = await roleAdd(this.form);
+        this.form = {};
+        this.drawer = false;
+        this.$message.success('添加角色成功');
+        this.init();
+      } else if (this.type === '1') {
+        const res = await roleUpdate(this.form);
+        this.form = {};
+        this.drawer = false;
+        this.$message.success('更新角色成功');
+        this.init();
+      }
+    },
     async roleList() {
       const res = await roleList();
       if (res && res.data.code === 0) {
@@ -164,6 +177,7 @@ export default {
       this.userAll();
     },
     roleAdd() {
+      this.type = '2';
       this.title = '新增角色';
       this.drawer = true;
     },
@@ -191,14 +205,6 @@ export default {
     },
     handleChange(value) {
       console.log(value);
-    },
-    async submit() {
-      const { type } = this.form;
-      if (type === '1') {
-        this.register();
-      } else if (type === '2') {
-
-      }
     },
     async register() {
       const len = this.deptValue.length - 1;
@@ -228,20 +234,21 @@ export default {
       }
     },
     editRole(row) {
+      this.type = '1';
       this.title = '编辑角色';
       this.drawer = true;
       this.form = { ...row };
     },
-    delUser(row) {
+    delRole(row) {
       const { id } = row;
-      this.$confirm('用户删除后将不可恢复，是否继续?', '提示', {
+      this.$confirm('角色删除后将不可恢复，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       })
         .then(async() => {
-          const res = await delUserById({
-            id
+          const res = await roleDel({
+            roleId: id
           });
           if (res && res.data.code === 0) {
             this.$message.success('删除成功');
