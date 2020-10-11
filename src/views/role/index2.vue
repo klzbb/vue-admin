@@ -86,6 +86,16 @@
           <el-form-item label="备注">
             <el-input v-model="form.remark" clearable type="textarea" />
           </el-form-item>
+          <el-form-item label="权限选择">
+            <el-tree
+              ref="tree"
+              :data="menuTree"
+              show-checkbox
+              node-key="id"
+              :default-checked-keys="checkedArr"
+              :props="defaultProps"
+            />
+          </el-form-item>
           <el-form-item>
             <el-button @click="drawer = false">取消</el-button>
             <el-button type="primary" @click="submit">确定</el-button>
@@ -102,6 +112,8 @@ import {
   roleList,
   roleAdd,
   roleDel,
+  roleTree,
+  roleMenuSave,
   roleUpdate,
   deptTree,
   register,
@@ -113,6 +125,12 @@ export default {
   name: 'Role2',
   data() {
     return {
+      checkedArr: [],
+      defaultProps: {
+        children: 'children',
+        label: 'name'
+      },
+      menuTree: [],
       type: '1',
       list: [],
       total: 0,
@@ -150,11 +168,51 @@ export default {
     this.init();
   },
   methods: {
+    async saveRoleMenu() {
+      const self = this;
+      const menuIds = self.$refs.tree.getCheckedNodes().map(item => item.id).join(',');
+      const params = {
+        menuIds: menuIds,
+        roleId: self.roleId
+      };
+      const res = await roleMenuSave(params);
+      if (res && res.data.code === 0) {
+        this.$message.success('保存成功');
+      }
+    },
+    async selectMenuTreeByRoleId(roleId) {
+      const res = await roleTree({
+        roleId
+      });
+      if (res && res.data.code === 0) {
+        const list = res.data.data;
+        this.menuTree = list;
+        this.checkedArr = this.deepForChecked(list);
+      }
+    },
+    /**
+     * 递归树状结构获取选中节点
+     * @return{Array} result
+     */
+    deepForChecked(data) {
+      const result = [];
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].checked === true) {
+          result.push(data[i].id);
+        }
+
+        if (data[i].children.length > 0) {
+          this.deepForChecked(data[i].children);
+        }
+      }
+      return result;
+    },
     async submit() {
       if (this.type === '2') {
         const res = await roleAdd(this.form);
         this.form = {};
         this.drawer = false;
+        // this.saveRoleMenu();
         this.$message.success('添加角色成功');
         this.init();
       } else if (this.type === '1') {
@@ -180,6 +238,7 @@ export default {
       this.type = '2';
       this.title = '新增角色';
       this.drawer = true;
+      this.selectMenuTreeByRoleId('0');
     },
     userSearch() {
 
@@ -236,8 +295,10 @@ export default {
     editRole(row) {
       this.type = '1';
       this.title = '编辑角色';
-      this.drawer = true;
       this.form = { ...row };
+      this.checkedArr = [];
+      this.selectMenuTreeByRoleId(row.id);
+      this.drawer = true;
     },
     delRole(row) {
       const { id } = row;

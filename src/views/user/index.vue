@@ -103,6 +103,16 @@
               @change="handleChange"
             />
           </el-form-item>
+          <el-form-item label="角色">
+            <el-select v-model="selectedRoles" multiple placeholder="请选择角色">
+              <el-option
+                v-for="item in roles"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              />
+            </el-select>
+          </el-form-item>
           <el-form-item label="用户状态">
             <el-select v-model="form.status" clearable placeholder="请选择用户状态">
               <el-option label="无效" :value="0" />
@@ -130,12 +140,15 @@ import {
   register,
   userAll,
   userList,
+  roleList,
   delUserById
 } from '@/api/index.js';
 export default {
   name: 'UserList',
   data() {
     return {
+      selectedRoles: [],
+      roles: [],
       total: 0,
       pageNo: 1,
       pageSize: 15,
@@ -176,6 +189,12 @@ export default {
     this.init();
   },
   methods: {
+    async roleList() {
+      const res = await roleList();
+      if (res && res.data.code === 0) {
+        this.roles = res.data.data;
+      }
+    },
     handleCurrentChange(val) {
       this.pageNo = val;
       this.userAll();
@@ -221,6 +240,7 @@ export default {
       const len = this.deptValue.length - 1;
       this.form.deptId = this.deptValue[len];
       const { username, telephone, password, mail, status, remark, deptId } = this.form;
+      const rolesStr = this.selectedRoles.join(',');
       const res = await register({
         username,
         telephone,
@@ -228,7 +248,8 @@ export default {
         mail,
         status,
         remark,
-        deptId
+        deptId,
+        rolesStr
       });
       if (res && res.data.code === 0) {
         this.drawer = false;
@@ -273,7 +294,7 @@ export default {
         });
     },
     init() {
-      Promise.all([this.deptTree(), this.userAll()])
+      Promise.all([this.deptTree(), this.userAll(), this.roleList()])
         .then(res => {
 
         })
