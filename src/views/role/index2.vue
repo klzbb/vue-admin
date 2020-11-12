@@ -208,19 +208,22 @@ export default {
       return result;
     },
     async submit() {
-      if (this.type === '2') {
-        const res = await roleAdd(this.form);
-        this.form = {};
-        this.drawer = false;
-        // this.saveRoleMenu();
-        this.$message.success('添加角色成功');
-        this.init();
-      } else if (this.type === '1') {
-        const res = await roleUpdate(this.form);
-        this.form = {};
-        this.drawer = false;
-        this.$message.success('更新角色成功');
-        this.init();
+      const _this = this;
+      if (_this.type === '2') {
+        _this.menuTree;
+        debugger;
+        const res = await roleAdd(_this.form);
+        _this.form = {};
+        _this.drawer = false;
+        // _this.saveRoleMenu();
+        _this.$message.success('添加角色成功');
+        _this.init();
+      } else if (_this.type === '1') {
+        const res = await roleUpdate(_this.form);
+        _this.form = {};
+        _this.drawer = false;
+        _this.$message.success('更新角色成功');
+        _this.init();
       }
     },
     async roleList() {
