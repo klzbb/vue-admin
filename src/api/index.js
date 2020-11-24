@@ -53,6 +53,13 @@ export const register = (params) => axios({
   data: formUtil(params)
 });
 
+// 更新用户
+export const updateById = (params) => axios({
+  url: '/app/user/updateById',
+  method: 'post',
+  data: formUtil(params)
+});
+
 // 用户列表
 export const userList = (params) => axios({
   url: '/app/user/list',

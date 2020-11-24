@@ -210,31 +210,33 @@ $cursor: #fff;
 .login-container {
   .el-input {
     display: inline-block;
-    height: 47px;
     width: 85%;
+    height: 47px;
 
     input {
-      background: transparent;
-      border: 0px;
-      -webkit-appearance: none;
-      border-radius: 0px;
+      height: 47px;
       padding: 12px 5px 12px 15px;
       color: $light_gray;
-      height: 47px;
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+
+      -webkit-appearance: none;
       caret-color: $cursor;
 
       &:-webkit-autofill {
-        box-shadow: 0 0 0px 1000px $bg inset !important;
+        box-shadow: 0 0 0 1000px $bg inset !important;
+
         -webkit-text-fill-color: $cursor !important;
       }
     }
   }
 
   .el-form-item {
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 5px;
     color: #454545;
+    background: rgba(0, 0, 0, .1);
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 5px;
   }
 }
 </style>

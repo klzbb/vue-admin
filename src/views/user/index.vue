@@ -141,7 +141,8 @@ import {
   userAll,
   userList,
   roleList,
-  delUserById
+  delUserById,
+  updateById
 } from '@/api/index.js';
 export default {
   name: 'UserList',
@@ -233,7 +234,28 @@ export default {
       if (type === '1') {
         this.register();
       } else if (type === '2') {
-
+        this.updateById();
+      }
+    },
+    async updateById() {
+      const len = this.deptValue.length - 1;
+      this.form.deptId = this.deptValue[len];
+      const { username, telephone, password, mail, status, remark, deptId } = this.form;
+      const rolesStr = this.selectedRoles.join(',');
+      const res = await updateById({
+        username,
+        telephone,
+        password,
+        mail,
+        status,
+        remark,
+        deptId,
+        rolesStr
+      });
+      if (res && res.data.code === 0) {
+        this.drawer = false;
+        this.$message.success('用户注册成功');
+        this.init();
       }
     },
     async register() {
@@ -268,7 +290,31 @@ export default {
     editUser(row) {
       this.title = '编辑用户';
       this.drawer = true;
-      this.form = { ...row };
+      this.form = { type: '2', ...row };
+      this.selectedRoles = (row.roleIds && row.roleIds.split(',').map(item => parseInt(item))) || [];
+      this.setDeptIds(this.deptTreeList, row.deptId);
+    },
+    /**
+     * 设置选中部门
+     */
+    setDeptIds(deptList, currentDeptId) {
+      for (let i = 0; i < deptList.length; i++) {
+        // console.log('item==', deptList[i]);
+        if (deptList[i].id === currentDeptId) {
+          console.log(deptList[i].level);
+          if (deptList[i].level.indexOf('.') !== -1) {
+            let arr = [];
+            arr = deptList[i].level.split('.').map(item => parseInt(item));
+            arr.shift();
+            arr.push(currentDeptId);
+            this.deptValue = arr;
+          } else {
+            this.deptValue = [currentDeptId];
+          }
+        } else if (deptList[i].deptList && deptList[i].deptList.length > 0) {
+          this.setDeptIds(deptList[i].deptList, currentDeptId);
+        }
+      }
     },
     delUser(row) {
       const { id } = row;
@@ -307,33 +353,33 @@ export default {
 </script>
 
 <style lang="scss">
-.user{
-  padding:15px;
-  &_form{
-    padding:0 10px 20px;
-    &_title{
-      margin-bottom: 20px;
+.user {
+  padding: 15px;
+  &_form {
+    padding: 0 10px 20px;
+    &_title {
       position: relative;
+      margin-bottom: 20px;
       line-height: 60px;
     }
-    &_title:after{
-      content:'';
-      width: 576px;
-      height: 1px;
-      background-color: #eee;
+    &_title:after {
+      content: "";
       position: absolute;
       bottom: 0;
       left: -10px;
+      width: 576px;
+      height: 1px;
+      background-color: #eee;
     }
   }
   .el-select,
-  .el-cascader{
-    display:block;
+  .el-cascader {
+    display: block;
   }
-  .el-pagination{
-    text-align:right;
-    margin-top: 20px;
+  .el-pagination {
     padding-right: 50px;
+    margin-top: 20px;
+    text-align: right;
   }
 }
 </style>
