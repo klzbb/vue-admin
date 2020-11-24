@@ -240,9 +240,10 @@ export default {
     async updateById() {
       const len = this.deptValue.length - 1;
       this.form.deptId = this.deptValue[len];
-      const { username, telephone, password, mail, status, remark, deptId } = this.form;
+      const { username, telephone, password, mail, status, remark, deptId, id } = this.form;
       const rolesStr = this.selectedRoles.join(',');
       const res = await updateById({
+        id,
         username,
         telephone,
         password,
@@ -254,7 +255,7 @@ export default {
       });
       if (res && res.data.code === 0) {
         this.drawer = false;
-        this.$message.success('用户注册成功');
+        this.$message.success('用户修改成功');
         this.init();
       }
     },
