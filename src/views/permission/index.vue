@@ -127,7 +127,7 @@ export default {
       userList: [],
       total: 0,
       isShowMenuDialog: false,
-      aclCasValue: [0, 5],
+      aclCasValue: [],
       aclForm: {
         name: '',
         parent_id: 0,
@@ -470,64 +470,64 @@ export default {
 
 </script>
 <style lang="scss" scoped>
-  .dept {
-    padding: 15px;
-    position: relative;
+.dept {
+  position: relative;
+  padding: 15px;
 
-    &_dept {
-      width: 100%;
-      &_label {
-        background-color: #409eff;
-        color: #fff;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 5px;
-        margin-bottom: 10px;
+  &_dept {
+    width: 100%;
+    &_label {
+      height: 40px;
+      padding: 0 5px;
+      margin-bottom: 10px;
+      color: #fff;
+      line-height: 40px;
+      background-color: #409eff;
 
-        .label {
-          margin-right: 20px;
-        }
-      }
-
-      &_tree_item {
-        flex: 1;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 14px;
-        padding-right: 8px;
+      .label {
+        margin-right: 20px;
       }
     }
 
-    &_user {
-      width: 100%;
-      position: absolute;
-      top: 15px;
-      left: 365px;
-      padding-left: 30px;
-
-      &_label {
-        background-color: #409eff;
-        color: #fff;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 5px;
-        margin-bottom: 10px;
-
-        .label {
-          margin-right: 20px;
-        }
-      }
-    }
-
-    // reset element-ui css
-    .el-cascader {
-      display: block;
-    }
-
-    .el-select {
-      display: block;
+    &_tree_item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex: 1;
+      padding-right: 8px;
+      font-size: 14px;
     }
   }
+
+  &_user {
+    position: absolute;
+    top: 15px;
+    left: 365px;
+    width: 100%;
+    padding-left: 30px;
+
+    &_label {
+      height: 40px;
+      padding: 0 5px;
+      margin-bottom: 10px;
+      color: #fff;
+      line-height: 40px;
+      background-color: #409eff;
+
+      .label {
+        margin-right: 20px;
+      }
+    }
+  }
+
+  // reset element-ui css
+  .el-cascader {
+    display: block;
+  }
+
+  .el-select {
+    display: block;
+  }
+}
 
 </style>

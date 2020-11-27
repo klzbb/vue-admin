@@ -1,216 +1,166 @@
 <template>
   <div class="role">
-    <div class="role_dept">
-      <div class="role_dept_label">
-        <span class="label">角色列表</span>
-        <i class="el-icon-circle-plus-outline" @click="addDept" />
-      </div>
-      <el-tree
-        :data="tree"
-        node-key="id"
-        :default-checked-keys="[]"
-        :props="defaultProps"
-        @node-click="nodeClick"
-      >
-        <span slot-scope="{ node, data }" class="role_dept_tree_item">
-          <span>{{ node.label }}</span>
-          <span>
-            <el-button type="text" size="mini" @click.stop="edit(data)">编辑</el-button>
-            <el-button type="text" size="mini" @click.stop="del(data)">删除</el-button>
-          </span>
-        </span>
-      </el-tree>
-    </div>
-    <div class="role_user">
-      <el-menu
-        :default-active="activeIndex"
-        class="el-menu-demo"
-        mode="horizontal"
-        background-color="#409eff"
-        text-color="#fff"
-        active-text-color="#ffd04b"
-        @select="handleSelect"
-      >
-        <el-menu-item index="1">角色与权限</el-menu-item>
-        <el-menu-item index="2">角色与用户</el-menu-item>
-      </el-menu>
-      <div class="role_user_user">
-        <el-tree
-          ref="tree"
-          :data="roleAclList"
-          show-checkbox
-          node-key="id"
-          :default-checked-keys="checkedArr"
-          :props="roleAclProps"
-        >
-          <span slot-scope="{ node, data }" class="role_dept_tree_item">
-            <span>{{ node.label }}</span>
-            <span>
-              <el-button type="text" size="mini" @click.stop="edit(data)">编辑</el-button>
-              <el-button type="text" size="mini" @click.stop="del(data)">删除</el-button>
-            </span>
-          </span>
-        </el-tree>
-        <el-button v-if="activeIndex === '1'" type="primary" @click="saveRoleMenu">保存</el-button>
-      </div>
-    </div>
-    <el-dialog
-      width="800px"
-      :modal-append-to-body="false"
-      :title="title"
-      :visible.sync="dialogFormVisible"
-    >
-      <el-form ref="elForm" :model="form">
-        <el-form-item prop="name" label="名称" :label-width="formLabelWidth">
-          <el-input v-model="form.name" :clearable="true" autocomplete="off" />
+    <div class="role_search">
+      <el-form :inline="true" :model="formInline" class="demo-form-inline">
+        <el-form-item>
+          <el-button type="primary" @click="roleAdd">新增</el-button>
         </el-form-item>
-        <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
-          <el-select v-model="form.status" placeholder="状态" clearable>
-            <el-option :value="0" label="禁用" />
-            <el-option :value="1" label="正常" />
-          </el-select>
+        <el-form-item label="角色名称">
+          <el-input v-model="formInline.user" clearable placeholder="角色名称" />
         </el-form-item>
-        <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
-          <el-input v-model="form.remark" :clearable="true" autocomplete="off" />
+        <el-form-item>
+          <el-button type="primary" @click="userSearch">查询</el-button>
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="sure">确 定</el-button>
+    </div>
+    <el-table
+      :data="list"
+      border
+      style="width: 100%"
+    >
+      <el-table-column
+        fixed
+        prop="name"
+        label="角色名称"
+        width="150"
+      />
+      <el-table-column
+        prop="operate_time"
+        label="最近修改时间"
+        width="120"
+      />
+      <el-table-column
+        prop="operator"
+        label="最近修改者"
+        width="200"
+      />
+      <el-table-column
+        prop="status"
+        label="角色状态"
+        width="100"
+      >
+        <div slot-scope="scope">
+          {{ scope.row.status | v10002 }}
+        </div>
+      </el-table-column>
+      <el-table-column
+        prop="remark"
+        label="备注"
+      />
+      <el-table-column
+        fixed="right"
+        label="操作"
+        width="200"
+      >
+        <template slot-scope="scope">
+          <el-button type="primary" @click="editRole(scope.row)">编辑</el-button>
+          <el-button type="danger" @click="delRole(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <el-pagination
+      :current-page.sync="pageNo"
+      :page-size="pageSize"
+      layout="total, prev, pager, next"
+      :total="total"
+      @current-change="handleCurrentChange"
+    />
+    <el-drawer
+      title="标题"
+      :visible.sync="drawer"
+      :with-header="false"
+    >
+      <div class="role_form">
+        <div class="role_form_title">{{ title }}</div>
+        <el-form ref="form" :model="form" label-width="80px">
+          <el-form-item label="角色名称">
+            <el-input v-model="form.name" clearable placeholder="请填写角色名称" />
+          </el-form-item>
+          <el-form-item label="角色状态">
+            <el-select v-model="form.status" clearable placeholder="请选择用户状态">
+              <el-option label="无效" :value="0" />
+              <el-option label="正常" :value="1" />
+              <el-option label="冻结" :value="2" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="备注">
+            <el-input v-model="form.remark" clearable type="textarea" />
+          </el-form-item>
+          <el-form-item label="权限选择">
+            <el-tree
+              ref="tree"
+              :data="menuTree"
+              show-checkbox
+              node-key="id"
+              :default-checked-keys="checkedArr"
+              :props="defaultProps"
+            />
+          </el-form-item>
+          <el-form-item>
+            <el-button @click="drawer = false">取消</el-button>
+            <el-button type="primary" @click="submit">确定</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-    </el-dialog>
 
-    <el-dialog
-      width="800px"
-      :modal-append-to-body="false"
-      :title="aclTitle"
-      :visible.sync="userVisible"
-    >
-      <el-form ref="aclForm" :model="aclForm">
-        <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
-          <el-cascader
-            v-model="aclCasValue"
-            :clearable="true"
-            :options="tree"
-            :props="cascaderProps"
-            placeholder="请选择上级权限模块"
-            @change="handleChange"
-          />
-        </el-form-item>
-        <el-form-item prop="name" label="权限点名称" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.name" placeholder="权限点名称" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="url" label="功能链接" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.url" placeholder="功能链接" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="type" label="类型" :label-width="formLabelWidth">
-          <el-select v-model="aclForm.type" placeholder="类型" clearable>
-            <el-option :value="1" label="菜单" />
-            <el-option :value="2" label="按钮" />
-            <el-option :value="3" label="其他" />
-          </el-select>
-        </el-form-item>
-        <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
-          <el-select v-model="aclForm.status" placeholder="状态" clearable>
-            <el-option :value="0" label="冻结" />
-            <el-option :value="1" label="正常" />
-          </el-select>
-        </el-form-item>
-        <el-form-item prop="seq" label="展示顺序" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.seq" placeholder="展示顺序" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.remark" placeholder="备注" clearable autocomplete="off" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="userVisible = false">取 消</el-button>
-        <el-button type="primary" @click="submit">确 定</el-button>
-      </div>
-    </el-dialog>
+    </el-drawer>
   </div>
 </template>
+
 <script>
 import {
-  roleMenuSave,
-  roleAdd,
-  roleUpdate,
   roleList,
+  roleAdd,
   roleDel,
   roleTree,
-  aclmoduleTree,
-  aclmoduleDel,
-  aclmoduleAdd,
-  aclmoduleUpdate,
-  aclAdd,
-  aclDel,
-  aclUpdate,
-  aclPageList,
-  aclmoduleFindLevelById,
-  deptUpdate,
+  roleMenuSave,
+  roleUpdate,
+  deptTree,
   register,
+  userAll,
   userList,
   delUserById
 } from '@/api/index.js';
 export default {
-  name: 'Role',
+  name: 'Role2',
   data() {
     return {
-      roleId: '',
-      activeIndex: '1',
       checkedArr: [],
-      aclModuleId: '',
-      pageNo: 1,
-      pageSize: 10,
-      roleAclList: [],
-      total: 0,
-      aclTitle: '添加用户',
-      userVisible: false,
-      aclCasValue: [],
-      aclForm: {
-        name: '',
-        aclModuleId: '',
-        url: '',
-        type: '',
-        status: 1,
-        seq: '',
-        remark: ''
-      },
-      type: '1', // 1-编辑部门 2-新增部门
-      title: '添加权限模块',
-      currentDept: {},
-      deptList: [],
-      value: [],
-      options: [],
-      tree: [],
       defaultProps: {
-        children: 'deptList',
-        label: 'name'
-      },
-      roleAclProps: {
-        isLeaf: this.leafFn,
         children: 'children',
         label: 'name'
       },
-      dialogTableVisible: false,
-      dialogFormVisible: false,
+      menuTree: [],
+      type: '1',
+      list: [],
+      total: 0,
+      pageNo: 1,
+      pageSize: 15,
+      userList: [],
+      deptProps: {
+        children: 'deptList',
+        label: 'name',
+        value: 'id'
+      },
+      deptTreeList: [],
+      options: [],
+      deptValue: '',
+      title: '新增用户',
+      formInline: {
+        user: '',
+        region: ''
+      },
       form: {
+        id: '',
         name: '',
         status: 1,
         remark: ''
       },
-      formLabelWidth: '120px',
-      cascaderProps: {
-        checkStrictly: true,
-        value: 'id',
-        expandTrigger: 'hover',
-        children: 'deptList',
-        label: 'name'
-      }
+      drawer: false
     };
   },
   watch: {
-    aclCasValue(cur, old) {
+    deptValue(cur, old) {
       console.log(cur);
     }
   },
@@ -218,109 +168,16 @@ export default {
     this.init();
   },
   methods: {
-    async saveRoleMenu() {
-      const self = this;
-      const menuIds = self.$refs.tree.getCheckedNodes().map(item => item.id).join(',');
-      const params = {
-        menuIds: menuIds,
-        roleId: self.roleId
-      };
-      const res = await roleMenuSave(params);
-      if (res && res.data.code === 0) {
-        this.$message.success('保存成功');
-      }
-    },
-    leafFn(data, node) {
-      if (data.aclModuleList) {
-        data.aclModuleList = data.aclModuleList.concat(data.aclList);
-      }
-    },
-    handleSelect(key, keyPath) {
-      console.log(key, keyPath);
-    },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-    aclDel(row) {
-      const { id } = row;
-      this.$confirm('权限点删除后将不可恢复，是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async() => {
-          const res = await aclDel({
-            id
-          });
-          if (res && res.data.code === 0) {
-            this.$message.success('删除成功');
-            this.selectAclListByAclModuleId(this.aclModuleId);
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-    },
-    async aclEdit(row) {
-      this.aclForm = {
-        ...row
-      };
-      this.aclTitle = '编辑权限点';
-      this.aclCasValue = await this.getLevel(row.acl_module_id);
-      this.userVisible = true;
-    },
-    async getLevel(aclModuleId) {
-      const res = await aclmoduleFindLevelById({
-        aclModuleId
-      });
-      const { level } = res.data.data;
-      let result;
-      if (level.indexOf('.') === -1) {
-        result = [level];
-      } else {
-        result = level.split('.');
-      }
-      result.push(aclModuleId);
-      result.shift();
-      result = result.map((item) => parseInt(item));
-      return result;
-    },
     /**
-     * 根据tree 和 parentId 转化aclCasValue值
-     * @param tree 树状数据结构
-     * @param parentId 当前权限点父级权限模块id
-     * @return array
+     * 默认选中权限
      */
-    deepByParentId(tree, parentId) {
-      // 取得parentId所属的顶层权限模块
-      const level = '';
-      const result = [];
-      const temp = tree.filter((item) => item.id === parentId);
-      if (temp.length > 0) {
-
-      } else {
-        this.deepByParentId();
-      }
-
-      return result;
-    },
-    nodeClick(data) {
-      this.roleId = data.id;
-      this.selectAclListByAclModuleId(data.id);
-    },
-    async selectAclListByAclModuleId(roleId) {
+    async selectMenuTreeByRoleId(roleId) {
       const res = await roleTree({
         roleId
       });
       if (res && res.data.code === 0) {
         const list = res.data.data;
-        this.roleAclList = list;
+        this.menuTree = list;
         this.checkedArr = this.deepForChecked(list);
       }
     },
@@ -330,73 +187,120 @@ export default {
      */
     deepForChecked(data) {
       const result = [];
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].checked === true) {
-          result.push(data[i].id);
-        }
-
-        if (data[i].children.length > 0) {
-          this.deepForChecked(data[i].children);
+      function deep(data) {
+        for (var i = 0; i < data.length; i++) {
+          if (data[i].checked === true) {
+            result.push(data[i].id);
+          }
+          if (data[i].children.length > 0) {
+            deep(data[i].children);
+          }
         }
       }
+      deep(data);
       return result;
     },
-    userAdd() {
-      this.aclForm = {};
-      this.aclCasValue = [];
-      this.aclTitle = '添加权限点';
-      this.userVisible = true;
-    },
+    /**
+     * 添加角色；角色菜单关联
+     */
     async submit() {
-      const len = this.aclCasValue.length - 1;
-      this.aclForm.aclModuleId = this.aclCasValue[len];
-      const {
-        name,
-        aclModuleId,
-        url,
-        type,
-        status,
-        seq,
-        remark
-      } = this.aclForm;
+      const _this = this;
+      if (_this.type === '2') {
+        _this.menuTree;
+        const menuIds = _this.$refs.tree.getCheckedNodes().map(item => item.id).join(',');
+        const res = await roleAdd({ ..._this.form, menuIds });
+        _this.form = {};
+        _this.drawer = false;
+        _this.$message.success('添加角色成功');
+        _this.init();
+      } else if (_this.type === '1') {
+        const menuIds = _this.$refs.tree.getCheckedNodes().map(item => item.id).join(',');
+        const res = await roleUpdate({ ..._this.form, menuIds });
+        _this.form = {};
+        _this.drawer = false;
+        _this.$message.success('更新角色成功');
+        _this.init();
+      }
+    },
+    async roleList() {
+      const res = await roleList();
+      if (res && res.data.code === 0) {
+        const list = res.data.data;
+        this.list = list;
+      }
+    },
+    handleCurrentChange(val) {
+      this.pageNo = val;
+      this.userAll();
+    },
+    roleAdd() {
+      this.type = '2';
+      this.title = '新增角色';
+      this.drawer = true;
+      this.selectMenuTreeByRoleId('0');
+    },
+    userSearch() {
 
-      const res = await aclAdd({
-        name,
-        aclModuleId,
-        url,
-        type,
+    },
+    async deptTree() {
+      const res = await deptTree();
+      if (res && res.data.code === 0) {
+        const tree = res.data.data;
+        this.deptTreeList = this.getTreeData(tree);
+        return res;
+      }
+    },
+    // 递归判断列表，把最后的children设为undefined
+    getTreeData(data) {
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].deptList.length < 1) {
+          data[i].deptList = undefined;
+        } else {
+          this.getTreeData(data[i].deptList);
+        }
+      }
+      return data;
+    },
+    handleChange(value) {
+      console.log(value);
+    },
+    async register() {
+      const len = this.deptValue.length - 1;
+      this.form.deptId = this.deptValue[len];
+      const { username, telephone, password, mail, status, remark, deptId } = this.form;
+      const res = await register({
+        username,
+        telephone,
+        password,
+        mail,
         status,
-        seq,
-        remark
+        remark,
+        deptId
       });
       if (res && res.data.code === 0) {
-        this.userVisible = false;
-        this.$message.success('权限点新增成功');
-        if (this.aclModuleId) this.selectAclListByAclModuleId(this.aclModuleId);
-      }
-    },
-    async sure() {
-      if (this.type === '2') {
-        const res = await roleAdd(this.form);
-        this.form = {};
-        this.dialogFormVisible = false;
-        this.$message.success('添加角色成功');
-        this.init();
-      } else if (this.type === '1') {
-        const res = await roleUpdate(this.form);
-        this.form = {};
-        this.dialogFormVisible = false;
-        this.$message.success('更新角色成功');
+        this.drawer = false;
+        this.$message.success('用户注册成功');
         this.init();
       }
     },
-    handleChange(value) {},
-    addDept() {
-      this.type = '2';
-      this.title = '添加角色';
-      this.dialogFormVisible = true;
+    async userAll() {
+      const res = await userAll({ pageNo: this.pageNo, pageSize: this.pageSize });
+      if (res && res.data.code === 0) {
+        this.userList = res.data.data.data;
+        this.total = res.data.data.total;
+        return res;
+      }
     },
-    del(item) {
+    editRole(row) {
+      this.type = '1';
+      this.title = '编辑角色';
+      this.form = { ...row };
+      this.checkedArr = [];
+      this.selectMenuTreeByRoleId(row.id);
+      this.drawer = true;
+    },
+    delRole(row) {
+      const { id } = row;
       this.$confirm('角色删除后将不可恢复，是否继续?', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -404,7 +308,7 @@ export default {
       })
         .then(async() => {
           const res = await roleDel({
-            roleId: item.id
+            roleId: id
           });
           if (res && res.data.code === 0) {
             this.$message.success('删除成功');
@@ -418,133 +322,47 @@ export default {
           });
         });
     },
-    edit(item) {
-      this.type = '1';
-      this.title = '编辑角色';
-      this.form = {
-        ...item
-      };
-      this.dialogFormVisible = true;
-    },
-    // 选中部门value 值转换 0.23.34 => [23,34]
-    formatToValue(item) {
-      let arr = [];
-      if (item.level.indexOf('.') !== -1) {
-        const tempArr = item.level.split('.');
-        for (let i = 0; i < tempArr.length; i++) {
-          if (tempArr[i] !== '0') {
-            arr.push(parseInt(tempArr[i]));
-          }
-        }
-      } else {
-        arr = [0];
-      }
-      console.log(arr);
-      return arr;
-    },
     init() {
       Promise.all([this.roleList()])
-        .then((res) => {})
-        .catch((e) => {});
-    },
+        .then(res => {
 
-    async roleList() {
-      const res = await roleList();
-      if (res && res.data.code === 0) {
-        const tree = res.data.data;
-        this.tree = tree;
-      }
-    },
-    formMatch(list) {
-      const arr = [
-        {
-          name: '无',
-          id: 0
-        }
-      ];
-      const result = arr.concat(list);
-      return result;
-    },
-    // 递归判断列表，把最后的children设为undefined
-    getTreeData(data) {
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].deptList.length < 1) {
-          // children若为空数组，则将children设为undefined
-          data[i].deptList = undefined;
-        } else {
-          // children若不为空数组，则继续 递归调用 本方法
-          this.getTreeData(data[i].deptList);
-        }
-      }
-      return data;
+        })
+        .catch(e => {
+          console.log(e);
+        });
     }
   }
 };
 </script>
+
 <style lang="scss">
 .role {
   padding: 15px;
-  position: relative;
-
-  &_dept {
-    width: 350px;
-
-    &_label {
-      background-color: #409eff;
-      color: #fff;
-      height: 40px;
-      line-height: 40px;
-      padding: 0 5px;
-      margin-bottom: 10px;
-
-      .label {
-        margin-right: 20px;
-      }
+  &_form {
+    padding: 0 10px 20px;
+    &_title {
+      position: relative;
+      margin-bottom: 20px;
+      line-height: 60px;
     }
-
-    &_tree_item {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      font-size: 14px;
-      padding-right: 8px;
+    &_title:after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: -10px;
+      width: 576px;
+      height: 1px;
+      background-color: #eee;
     }
   }
-
-  &_user {
-    width: 100%;
-    position: absolute;
-    top: 15px;
-    left: 365px;
-    padding-left: 30px;
-
-    &_label {
-      background-color: #409eff;
-      color: #fff;
-      height: 40px;
-      line-height: 40px;
-      padding: 0 5px;
-      margin-bottom: 10px;
-
-      .label {
-        margin-right: 20px;
-      }
-    }
-  }
-
-  // reset element-ui css
+  .el-select,
   .el-cascader {
     display: block;
   }
-
-  .el-select {
-    display: block;
-  }
-
-  .el-menu--horizontal > .el-menu-item {
-    height: 40px;
-    line-height: 40px;
+  .el-pagination {
+    padding-right: 50px;
+    margin-top: 20px;
+    text-align: right;
   }
 }
 </style>
