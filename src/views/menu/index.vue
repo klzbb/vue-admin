@@ -2,7 +2,6 @@
   <div class="dept">
     <div class="dept_dept">
       <div class="dept_dept_label">
-        <!-- <el-button type="primary" @click="addMenu">新增</el-button> -->
         <el-popover
           v-model="isShowAdd"
           placement="top"
@@ -67,8 +66,14 @@
         </el-table-column>
       </el-table>
     </div>
+    <!-- 新增菜单 -->
+    <menu-add
+      :menu-add-visiable.sync="menuAddVisiable"
+      @close="handleMenuAddClose"
+      @success="handleMenuAddSuccess"
+    />
     <!-- 右侧弹窗 -->
-    <el-drawer
+    <!-- <el-drawer
       class="permis"
       title="标题"
       :visible.sync="isShowMenuDialog"
@@ -117,9 +122,10 @@
         <el-button @click="isShowMenuDialog = false">取 消</el-button>
         <el-button type="primary" @click="sure">确 定</el-button>
       </div>
-    </el-drawer>
+    </el-drawer> -->
+
     <!-- 图标弹窗 -->
-    <el-dialog
+    <!-- <el-dialog
       :visible.sync="dialogVisible"
       :modal="false"
       width="35%"
@@ -135,7 +141,7 @@
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
       </span>
-    </el-dialog>
+    </el-dialog> -->
   </div>
 </template>
 <script>
@@ -154,10 +160,13 @@ import {
   userList,
   delUserById
 } from '@/api/index.js';
+import MenuAdd from './components/MenuAdd';
 export default {
-  name: 'Dept',
+  name: 'MenuIndex',
+  components: { MenuAdd },
   data() {
     return {
+      menuAddVisiable: false,
       activeName: 'second',
       dialogVisible: false,
       isShowAdd: false,
@@ -219,6 +228,13 @@ export default {
     this.init();
   },
   methods: {
+
+    handleMenuAddClose() {
+
+    },
+    handleMenuAddSuccess() {
+
+    },
     iconTab(tab, event) {
       console.log(tab, event);
     },
@@ -407,11 +423,11 @@ export default {
     handleChange(value) {},
     addMenu() {
       this.isShowAdd = false;
-      this.type = '2';
-      this.form.status = 1;
-      this.aclForm.type = 1;
+      this.menuAddVisiable = true;
+      // this.type = '2';
+      // this.form.status = 1;
+      // this.aclForm.type = 1;
       this.title = '新增菜单';
-      this.isShowMenuDialog = true;
     },
     addBtn() {
       this.isShowAdd = false;

@@ -64,13 +64,13 @@ export const constantRoutes = [
     ]
   },
   {
-    path: '/permission',
+    path: '/menu',
     component: Layout,
     children: [
       {
         path: 'index',
-        component: () => import('@/views/permission/index'),
-        name: 'Permission',
+        component: () => import('@/views/menu/index'),
+        name: 'MenuIndex',
         meta: { title: '菜单管理', icon: 'documentation', noCache: true }
       }
     ]
