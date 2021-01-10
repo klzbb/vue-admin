@@ -36,15 +36,15 @@ module.exports = {
       warnings: false,
       errors: true
     },
-    proxy: {
-      '/app': {
-        target: process.env.VUE_APP_SERVICE_URL,
-        changeOrign: true,
-        pathRewrite: {
-          '^/app': '/app'
-        }
-      }
-    },
+    // proxy: {
+    //   '/app': {
+    //     target: process.env.VUE_APP_SERVICE_URL,
+    //     changeOrign: true,
+    //     pathRewrite: {
+    //       '^/app': '/app'
+    //     }
+    //   }
+    // },
     before: require('./mock/mock-server.js')
   },
   configureWebpack: {

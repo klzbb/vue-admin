@@ -228,7 +228,9 @@ export default {
     this.init();
   },
   methods: {
-
+    test() {
+      console.log('jenkins自动化部署test');
+    },
     handleMenuAddClose() {
 
     },

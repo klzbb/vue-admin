@@ -13,7 +13,7 @@ import { getToken } from '@/utils/auth';
 import router from '@/router/index.js';
 // create an axios instance
 const service = axios.create({
-  // baseURL: process.env.VUE_APP_SERVICE_URL, // url = base url + request url
+  // baseURL: process.env.VUE_APP_SERVICE_URL // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   // timeout: 20000 // request timeout
 });
