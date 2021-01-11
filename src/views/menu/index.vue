@@ -229,7 +229,7 @@ export default {
   },
   methods: {
     test() {
-      console.log('jenkins自动化部署test3');
+      console.log('jenkins自动化部署test4');
     },
     handleMenuAddClose() {
 
