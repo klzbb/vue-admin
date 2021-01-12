@@ -229,7 +229,7 @@ export default {
   },
   methods: {
     test() {
-      console.log('jenkins自动化部署test4');
+      console.log('jenkins应用服务器基本路径修改测试');
     },
     handleMenuAddClose() {
 
