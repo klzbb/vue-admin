@@ -2,10 +2,10 @@
 
 @mixin colorBtn($color) {
   background: $color;
-
+  
   &:hover {
     color: $color;
-
+    
     &:before,
     &:after {
       background: $color;
@@ -51,17 +51,17 @@
   transition: 600ms ease all;
   position: relative;
   display: inline-block;
-
+  
   &:hover {
     background: #fff;
-
+    
     &:before,
     &:after {
       width: 100%;
       transition: 600ms ease all;
     }
   }
-
+  
   &:before,
   &:after {
     content: '';
@@ -72,7 +72,7 @@
     width: 0;
     transition: 400ms ease all;
   }
-
+  
   &::after {
     right: inherit;
     top: inherit;

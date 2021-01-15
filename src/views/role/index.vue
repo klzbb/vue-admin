@@ -91,6 +91,8 @@
               ref="tree"
               :data="menuTree"
               show-checkbox
+              check-strictly
+
               node-key="id"
               :default-checked-keys="checkedArr"
               :props="defaultProps"

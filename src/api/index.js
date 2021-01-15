@@ -200,3 +200,9 @@ export const roleMenuSave = (params) => axios({
   method: 'post',
   data: formUtil(params)
 });
+
+// 用户权限路由
+export const getPermissionMenusByUid = () => axios({
+  url: '/app/menu/getPermissionMenusByUid',
+  method: 'post'
+});

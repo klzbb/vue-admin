@@ -79,6 +79,7 @@
 <script>
 import { validUsername } from '@/utils/validate';
 import SocialSign from './components/SocialSignin';
+import { getPermissionMenusByUid } from '@/api/index.js';
 export default {
   name: 'Login',
   components: { SocialSign },
@@ -100,7 +101,7 @@ export default {
     };
     return {
       loginForm: {
-        username: '13622894595',
+        username: '13018556423',
         password: '123444'
       },
       loginRules: {
@@ -169,6 +170,7 @@ export default {
           try {
             await this.$store.dispatch('user/login', this.loginForm);
             this.loading = false;
+            const routes = await getPermissionMenusByUid();
             this.$router.push({ name: 'Dept' });
             this.$message.success('你已登录');
           } catch (e) {
