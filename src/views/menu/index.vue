@@ -69,79 +69,8 @@
     <!-- 新增菜单 -->
     <menu-add
       :menu-add-visiable.sync="menuAddVisiable"
-      @close="handleMenuAddClose"
       @success="handleMenuAddSuccess"
     />
-    <!-- 右侧弹窗 -->
-    <!-- <el-drawer
-      class="permis"
-      title="标题"
-      :visible.sync="isShowMenuDialog"
-      :with-header="false"
-    >
-      <el-form ref="aclForm" class="permis_form" :model="aclForm">
-        <div class="permis_title">{{ title }}</div>
-        <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
-          <el-cascader
-            v-model="aclCasValue"
-            :clearable="true"
-            :options="tree"
-            :props="cascaderProps"
-            placeholder="请选择上级权限模块"
-            @change="handleChange"
-          />
-        </el-form-item>
-        <el-form-item prop="name" label="菜单名称" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.name" placeholder="菜单名称" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="url" label="菜单URL" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.url" placeholder="请输入菜单URL" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="component" label="组件地址" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.component" placeholder="请输入组件地址" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="icon" label="菜单图标" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.icon" placeholder="请输入菜单图标" clearable autocomplete="off">
-            <el-button slot="append" icon="el-icon-setting" @click="setIcon" />
-          </el-input>
-        </el-form-item>
-        <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
-          <el-select v-model="aclForm.status" placeholder="状态" clearable>
-            <el-option :value="0" label="冻结" />
-            <el-option :value="1" label="正常" />
-          </el-select>
-        </el-form-item>
-        <el-form-item prop="seq" label="菜单顺序" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.seq" placeholder="菜单顺序" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.remark" placeholder="备注" clearable autocomplete="off" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="isShowMenuDialog = false">取 消</el-button>
-        <el-button type="primary" @click="sure">确 定</el-button>
-      </div>
-    </el-drawer> -->
-
-    <!-- 图标弹窗 -->
-    <!-- <el-dialog
-      :visible.sync="dialogVisible"
-      :modal="false"
-      width="35%"
-      :before-close="handleClose"
-    >
-      <el-tabs v-model="activeName" @tab-click="iconTab">
-        <el-tab-pane label="用户管理" name="first">用户管理</el-tab-pane>
-        <el-tab-pane label="配置管理" name="second">配置管理</el-tab-pane>
-        <el-tab-pane label="角色管理" name="third">角色管理</el-tab-pane>
-        <el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane>
-      </el-tabs>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogVisible = false">确 定</el-button>
-      </span>
-    </el-dialog> -->
   </div>
 </template>
 <script>
@@ -228,14 +157,9 @@ export default {
     this.init();
   },
   methods: {
-    test() {
-      console.log('jenkins应用服务器基本路径修改测试');
-    },
-    handleMenuAddClose() {
-
-    },
     handleMenuAddSuccess() {
-
+      this.menuAddVisiable = false;
+      this.init();
     },
     iconTab(tab, event) {
       console.log(tab, event);

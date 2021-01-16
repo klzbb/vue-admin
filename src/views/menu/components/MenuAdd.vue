@@ -5,6 +5,8 @@
       title="标题"
       :visible.sync="menuAddVisiable"
       :with-header="false"
+      :wrapper-closable="false"
+      destroy-on-close
     >
       <el-form ref="aclForm" class="permis_form" :model="aclForm">
         <div class="permis_title">新增菜单</div>
@@ -15,7 +17,7 @@
             :options="tree"
             :props="cascaderProps"
             placeholder="请选择上级权限模块"
-            @change="handleChange"
+            @focus="focus"
           />
         </el-form-item>
         <el-form-item prop="name" label="菜单名称" :label-width="formLabelWidth">
@@ -98,12 +100,14 @@ export default {
     },
     cancel() {
       this.menuAddVisiable = false;
-      this.$emmit('update:menuAddVisiable', false);
+      this.$emit('update:menuAddVisiable', false);
     },
     setIcon() {
       this.dialogVisible = true;
     },
-    handleChange(value) {},
+    focus() {
+      this.aclmoduleTree();
+    },
     async aclmoduleTree() {
       const res = await aclmoduleTree();
       if (res && res.data.code === 0) {
@@ -164,7 +168,7 @@ export default {
         this.aclForm = {};
         this.isShowMenuDialog = false;
         this.$message.success('添加菜单成功');
-        this.init();
+        this.$emit('success');
       }
     }
 
