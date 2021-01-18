@@ -92,7 +92,6 @@
               :data="menuTree"
               show-checkbox
               check-strictly
-
               node-key="id"
               :default-checked-keys="checkedArr"
               :props="defaultProps"
@@ -317,12 +316,7 @@ export default {
             this.init();
           }
         })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
+        .catch(() => {});
     },
     init() {
       Promise.all([this.roleList()])

@@ -50,8 +50,8 @@
           width="80"
         />
         <el-table-column
-          prop="url"
-          label="功能链接"
+          prop="path"
+          label="地址"
         />
         <el-table-column
           prop="seq"

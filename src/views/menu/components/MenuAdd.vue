@@ -23,8 +23,8 @@
         <el-form-item prop="name" label="菜单名称" :label-width="formLabelWidth">
           <el-input v-model="aclForm.name" placeholder="菜单名称" clearable autocomplete="off" />
         </el-form-item>
-        <el-form-item prop="url" label="菜单URL" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.url" placeholder="请输入菜单URL" clearable autocomplete="off" />
+        <el-form-item prop="path" label="菜单URL" :label-width="formLabelWidth">
+          <el-input v-model="aclForm.path" placeholder="请输入菜单URL" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="component" label="组件地址" :label-width="formLabelWidth">
           <el-input v-model="aclForm.component" placeholder="请输入组件地址" clearable autocomplete="off" />
@@ -81,7 +81,7 @@ export default {
         parent_id: 0,
         component: '',
         icon: '',
-        url: '',
+        path: '',
         type: 1,
         status: 1,
         seq: '',
@@ -150,7 +150,7 @@ export default {
         parent_id: parentId,
         name,
         seq,
-        url,
+        path,
         type,
         status,
         remark
@@ -159,7 +159,7 @@ export default {
         parentId: parentId || 0,
         name,
         seq,
-        url,
+        path,
         type,
         status,
         remark
