@@ -22,7 +22,7 @@ router.beforeEach(async(to, from, next) => {
   // start progress bar
   NProgress.start();
   const { loginStatus } = store.getters;
-  // store.commit('permission/SET_ROUTES', []);
+  store.commit('permission/SET_ROUTES', []);
   if (loginStatus === '0') {
     if (whiteList.indexOf(to.path) !== -1) {
       next();
@@ -35,16 +35,17 @@ router.beforeEach(async(to, from, next) => {
       next({ path: '/' });
     } else {
       next();
-      // const { permission_routes } = store.getters;
-      // if (permission_routes && permission_routes.length > 0) {
-      //   next();
-      // } else {
-      //   const accessRoutes = await getPermissionMenusByUid();
-      //   store.commit('permission/SET_ROUTES', accessRoutes);
-      //   router.addRoutes(accessRoutes);
-      //   console.log('kkkk=', store.getters.permission_routes);
-      //   next({ ...to, replace: true });
-      // }
+      const { permission_routes } = store.getters;
+      if (permission_routes && permission_routes.length > 0) {
+        next();
+      } else {
+        const res = await getPermissionMenusByUid();
+        const accessRoutes = res.data.data;
+        store.commit('permission/SET_ROUTES', accessRoutes);
+        router.addRoutes(accessRoutes);
+        console.log('kkkk=', store.getters.permission_routes);
+        next({ ...to, replace: true });
+      }
     }
   }
   // // set page title
