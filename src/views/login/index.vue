@@ -79,7 +79,7 @@
 <script>
 import { validUsername } from '@/utils/validate';
 import SocialSign from './components/SocialSignin';
-import { getPermissionMenusByUid } from '@/api/index.js';
+import router from '@/router';
 export default {
   name: 'Login',
   components: { SocialSign },
@@ -170,7 +170,6 @@ export default {
           try {
             await this.$store.dispatch('user/login', this.loginForm);
             this.loading = false;
-            const routes = await getPermissionMenusByUid();
             this.$router.push({ name: 'Dept' });
             this.$message.success('你已登录');
           } catch (e) {

@@ -395,12 +395,7 @@ export default {
             this.init();
           }
         })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
+        .catch(() => {});
     },
     edit(item) {
       this.type = '1';

@@ -13,7 +13,6 @@
         border
         default-expand-all
         :tree-props="defaultProps"
-        @selection-change="handleSelectionChange"
       >
         <el-table-column
           type="selection"

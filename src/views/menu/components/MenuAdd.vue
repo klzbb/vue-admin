@@ -29,6 +29,9 @@
         <el-form-item prop="component" label="组件地址" :label-width="formLabelWidth">
           <el-input v-model="aclForm.component" placeholder="请输入组件地址" clearable autocomplete="off" />
         </el-form-item>
+        <el-form-item prop="componentName" label="组件名称" :label-width="formLabelWidth">
+          <el-input v-model="aclForm.componentName" placeholder="请输入组件名称" clearable autocomplete="off" />
+        </el-form-item>
         <el-form-item prop="icon" label="菜单图标" :label-width="formLabelWidth">
           <el-input v-model="aclForm.icon" placeholder="请输入菜单图标" clearable autocomplete="off">
             <el-button slot="append" icon="el-icon-setting" @click="setIcon" />
@@ -41,7 +44,7 @@
           </el-select>
         </el-form-item>
         <el-form-item prop="seq" label="菜单顺序" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.seq" placeholder="菜单顺序111" clearable autocomplete="off" />
+          <el-input v-model="aclForm.seq" placeholder="菜单顺序" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
           <el-input v-model="aclForm.remark" placeholder="备注" clearable autocomplete="off" />
@@ -80,6 +83,7 @@ export default {
         name: '',
         parent_id: 0,
         component: '',
+        componentName: '',
         icon: '',
         path: '',
         type: 1,
@@ -152,6 +156,9 @@ export default {
         seq,
         path,
         type,
+        component,
+        componentName,
+        icon,
         status,
         remark
       } = this.aclForm;
@@ -160,12 +167,15 @@ export default {
         name,
         seq,
         path,
+        component,
+        componentName,
+        icon,
         type,
         status,
         remark
       });
       if (res && res.data.code === 0) {
-        this.aclForm = {};
+        this.$refs.aclForm.resetFields();
         this.isShowMenuDialog = false;
         this.$message.success('添加菜单成功');
         this.$emit('success');
