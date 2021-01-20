@@ -170,7 +170,7 @@ export default {
           try {
             await this.$store.dispatch('user/login', this.loginForm);
             this.loading = false;
-            this.$router.push({ name: 'Dept' });
+            this.$router.push('/sys/home');
             this.$message.success('你已登录');
           } catch (e) {
             this.loading = false;

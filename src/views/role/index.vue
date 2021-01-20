@@ -123,7 +123,7 @@ import {
   delUserById
 } from '@/api/index.js';
 export default {
-  name: 'Role2',
+  name: 'Role',
   data() {
     return {
       checkedArr: [],

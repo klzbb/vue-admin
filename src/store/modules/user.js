@@ -56,6 +56,7 @@ const actions = {
       logout().then(() => {
         commit('SET_LOGIN_STATUS', '0');
         commit('SET_USER_INFO', {});
+        commit('permission/RESET_ROUTER', null, { root: true });
         resetRouter();
         // reset visited views and cached views
         // to fixed https://github.com/PanJiaChen/vue-element-admin/issues/2485

@@ -23,13 +23,13 @@
         <el-form-item prop="name" label="菜单名称" :label-width="formLabelWidth">
           <el-input v-model="aclForm.name" placeholder="菜单名称" clearable autocomplete="off" />
         </el-form-item>
-        <el-form-item prop="path" label="菜单URL" :label-width="formLabelWidth">
+        <el-form-item prop="path" label="Path" :label-width="formLabelWidth">
           <el-input v-model="aclForm.path" placeholder="请输入菜单URL" clearable autocomplete="off" />
         </el-form-item>
-        <el-form-item prop="component" label="组件地址" :label-width="formLabelWidth">
+        <el-form-item prop="component" label="Component" :label-width="formLabelWidth">
           <el-input v-model="aclForm.component" placeholder="请输入组件地址" clearable autocomplete="off" />
         </el-form-item>
-        <el-form-item prop="componentName" label="组件名称" :label-width="formLabelWidth">
+        <el-form-item prop="componentName" label="componentName" :label-width="formLabelWidth">
           <el-input v-model="aclForm.componentName" placeholder="请输入组件名称" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="icon" label="菜单图标" :label-width="formLabelWidth">
@@ -176,6 +176,7 @@ export default {
       });
       if (res && res.data.code === 0) {
         this.$refs.aclForm.resetFields();
+        this.aclCasValue = [];
         this.isShowMenuDialog = false;
         this.$message.success('添加菜单成功');
         this.$emit('success');

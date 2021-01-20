@@ -71,6 +71,10 @@
       :menu-add-visiable.sync="menuAddVisiable"
       @success="handleMenuAddSuccess"
     />
+    <menu-edit
+      :visiable.sync="menuEditVisiable"
+      @updateMenu="updateMenu"
+    />
   </div>
 </template>
 <script>
@@ -90,12 +94,14 @@ import {
   delUserById
 } from '@/api/index.js';
 import MenuAdd from './components/MenuAdd';
+import MenuEdit from './components/MenuEdit';
 export default {
   name: 'MenuIndex',
-  components: { MenuAdd },
+  components: { MenuAdd, MenuEdit },
   data() {
     return {
       menuAddVisiable: false,
+      menuEditVisiable: false,
       activeName: 'second',
       dialogVisible: false,
       isShowAdd: false,
@@ -204,16 +210,7 @@ export default {
           });
         });
     },
-    async aclEdit(row) {
-      this.aclForm = {
-        ...row
-      };
-      this.aclTitle = '编辑权限点';
-      this.aclCasValue = [8, 9];
-      // this.aclCasValue = await this.getLevel(row.acl_module_id)
-      console.log(this.aclCasValue);
-      this.isShowMenuDialog = true;
-    },
+
     async getLevel(aclModuleId) {
       const res = await aclmoduleFindLevelById({ aclModuleId });
       const { level } = res.data.data;
@@ -366,7 +363,7 @@ export default {
       this.aclForm = { ...row };
       this.aclCasValue = this.levelToArr(row.level);
       this.title = '编辑菜单';
-      this.isShowMenuDialog = true;
+      this.menuEditVisiable = true;
     },
     levelToArr(level) {
       let result;
