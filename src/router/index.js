@@ -58,7 +58,7 @@ export const constantRoutes = [
     children: [
       {
         path: '/sys/home',
-        component: () => import('@/views/system/home'),
+        component: () => import(/* webpackChunkName: "systemHome" */'@/views/system/home'),
         hidden: true,
         meta: { icon: 'documentation', noCache: true }
       }

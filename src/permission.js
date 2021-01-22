@@ -22,7 +22,6 @@ router.beforeEach(async(to, from, next) => {
   // start progress bar
   NProgress.start();
   const { loginStatus } = store.getters;
-  // store.commit('permission/SET_ROUTES', []);
   if (loginStatus === '0') {
     if (whiteList.indexOf(to.path) !== -1) {
       next();
@@ -34,8 +33,6 @@ router.beforeEach(async(to, from, next) => {
     if (to.path === '/login') {
       next({ path: '/' });
     } else {
-      next();
-      console.log('permission_routes=', permission_routes);
       const { permission_routes } = store.getters;
       if (permission_routes && permission_routes.length) {
         next();
@@ -59,7 +56,6 @@ function filterAsyncRoutes(routes) {
           route.component = () => import('@/layout/index.vue');
           break;
         default:
-          // route.component = () => import(`@/views${route.component}.vue`);
           route.component = view(route.component);
           break;
       }
