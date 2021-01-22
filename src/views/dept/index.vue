@@ -42,6 +42,7 @@
       </el-table>
     </div>
     <el-dialog
+      ref="deptForm"
       width="800px"
       :modal-append-to-body="false"
       :title="title"
@@ -115,7 +116,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button @click="userVisible = false">取 消</el-button>
+        <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="submit">确 定</el-button>
       </div>
     </el-dialog>
@@ -186,6 +187,9 @@ export default {
     this.init();
   },
   methods: {
+    cancel() {
+      this.userVisible = false;
+    },
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
     },

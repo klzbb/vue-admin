@@ -72,24 +72,24 @@
     >
       <div class="role_form">
         <div class="role_form_title">{{ title }}</div>
-        <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="角色名称">
+        <el-form ref="roleForm" :model="form" label-width="80px">
+          <el-form-item label="角色名称" prop="name">
             <el-input v-model="form.name" clearable placeholder="请填写角色名称" />
           </el-form-item>
-          <el-form-item label="角色状态">
+          <el-form-item label="角色状态" prop="status">
             <el-select v-model="form.status" clearable placeholder="请选择用户状态">
               <el-option label="无效" :value="0" />
               <el-option label="正常" :value="1" />
               <el-option label="冻结" :value="2" />
             </el-select>
           </el-form-item>
-          <el-form-item label="备注">
+          <el-form-item label="备注" prop="remark">
             <el-input v-model="form.remark" clearable type="textarea" />
           </el-form-item>
-          <el-form-item label="权限选择">
+          <el-form-item label="权限选择" prop="menuTree">
             <el-tree
               ref="tree"
-              :data="menuTree"
+              :data="form.menuTree"
               show-checkbox
               check-strictly
               node-key="id"
@@ -98,7 +98,7 @@
             />
           </el-form-item>
           <el-form-item>
-            <el-button @click="drawer = false">取消</el-button>
+            <el-button @click="cancel">取消</el-button>
             <el-button type="primary" @click="submit">确定</el-button>
           </el-form-item>
         </el-form>
@@ -148,6 +148,7 @@ export default {
       deptValue: '',
       title: '新增用户',
       formInline: {
+        menuTree: [],
         user: '',
         region: ''
       },
@@ -169,6 +170,22 @@ export default {
     this.init();
   },
   methods: {
+    cancel() {
+      this.$refs['roleForm'].resetFields();
+      this.checkedArr = [];
+
+      this.drawer = false;
+    },
+    editRole(row) {
+      this.drawer = true;
+      this.$nextTick(() => {
+        this.type = '1';
+        this.title = '编辑角色';
+        this.form = { ...row };
+        this.checkedArr = [];
+        this.selectMenuTreeByRoleId(row.id);
+      });
+    },
     /**
      * 默认选中权限
      */
@@ -179,6 +196,7 @@ export default {
       if (res && res.data.code === 0) {
         const list = res.data.data;
         this.menuTree = list;
+        this.form.menuTree = list;
         this.checkedArr = this.deepForChecked(list);
       }
     },
@@ -238,7 +256,6 @@ export default {
       this.type = '2';
       this.title = '新增角色';
       this.drawer = true;
-      this.selectMenuTreeByRoleId('0');
     },
     userSearch() {
 
@@ -292,14 +309,7 @@ export default {
         return res;
       }
     },
-    editRole(row) {
-      this.type = '1';
-      this.title = '编辑角色';
-      this.form = { ...row };
-      this.checkedArr = [];
-      this.selectMenuTreeByRoleId(row.id);
-      this.drawer = true;
-    },
+
     delRole(row) {
       const { id } = row;
       this.$confirm('角色删除后将不可恢复，是否继续?', '提示', {
