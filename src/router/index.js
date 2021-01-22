@@ -65,38 +65,6 @@ export const constantRoutes = [
     ]
 
   },
-  // {
-  //   path: '/sys-manager',
-  //   component: Layout,
-  //   name: 'Layout',
-  //   meta: { title: '系统管理', icon: 'documentation' },
-  //   children: [
-  //     {
-  //       path: 'memu',
-  //       component: () => import('@/views/menu/index'),
-  //       name: 'MenuIndex',
-  //       meta: { title: '菜单管理', icon: 'documentation', noCache: true }
-  //     },
-  //     {
-  //       path: 'role',
-  //       component: () => import('@/views/role/index'),
-  //       name: 'Role',
-  //       meta: { title: '角色管理', icon: 'documentation', noCache: true }
-  //     },
-  //     {
-  //       path: 'user',
-  //       component: () => import('@/views/user/index.vue'),
-  //       name: 'UserList',
-  //       meta: { title: '用户管理', icon: 'documentation', noCache: true }
-  //     },
-  //     {
-  //       path: 'dept',
-  //       component: () => import('@/views/dept/index.vue'),
-  //       name: 'Dept',
-  //       meta: { title: '部门管理', icon: 'documentation', noCache: true }
-  //     }
-  //   ]
-  // },
   {
     path: '/login',
     component: () => import('@/views/login/index'),
