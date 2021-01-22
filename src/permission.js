@@ -59,8 +59,8 @@ function filterAsyncRoutes(routes) {
           route.component = () => import('@/layout/index.vue');
           break;
         default:
-          // route.component = () => import(`@/views${route.component}.vue`);
-          route.component = view(route.component);
+          route.component = () => import(`@/views${route.component}.vue`);
+          // route.component = view(route.component);
           break;
       }
       if (route.children && route.children.length) {
@@ -71,10 +71,10 @@ function filterAsyncRoutes(routes) {
   });
 }
 
-function view(path) {
-  console.log(`@/views${path}.vue`);
-  return (resolve) => require([`./views${path}.vue`], resolve);
-}
+// function view(path) {
+//   console.log(`@/views${path}.vue`);
+//   return (resolve) => require([`./views${path}.vue`], resolve);
+// }
 
 router.afterEach(() => {
   // finish progress bar
