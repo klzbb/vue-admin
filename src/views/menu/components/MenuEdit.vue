@@ -104,7 +104,7 @@ export default {
     },
     cancel() {
       this.visiable = false;
-      this.$emit('update:menuEditVisiable', false);
+      this.$emit('update:visiable', false);
     },
     setIcon() {
       this.dialogVisible = true;
@@ -145,7 +145,7 @@ export default {
       return data;
     },
     /**
-     * 创建菜单
+     * 编辑菜单
      */
     async createMenu() {
       const len = this.aclCasValue.length - 1;

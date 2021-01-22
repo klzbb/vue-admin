@@ -37,6 +37,9 @@ router.beforeEach(async(to, from, next) => {
       if (permission_routes && permission_routes.length) {
         next();
       } else {
+        /**
+         * 生成动态路由
+         */
         const res = await getPermissionMenusByUid();
         const accessRoutes = filterAsyncRoutes(res.data.data);
         store.commit('permission/SET_ROUTES', accessRoutes);

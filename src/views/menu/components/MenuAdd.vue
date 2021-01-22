@@ -33,7 +33,7 @@
           <el-input v-model="aclForm.componentName" placeholder="请输入组件名称" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="icon" label="菜单图标" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.icon" placeholder="请输入菜单图标" clearable autocomplete="off">
+          <el-input v-model="aclForm.icon" placeholder="点击右侧按钮选择图标" clearable autocomplete="off">
             <el-button slot="append" icon="el-icon-setting" @click="setIcon" />
           </el-input>
         </el-form-item>
@@ -55,12 +55,18 @@
         <el-button type="primary" @click="createMenu">确 定</el-button>
       </div>
     </el-drawer>
+    <Icons
+      :is-show.sync="isShowIcons"
+      @sure="getIconName"
+    />
   </div>
 </template>
 <script>
 import { aclmoduleAdd, aclmoduleTree } from '@/api/index.js';
+import Icons from './Icons.vue';
 export default {
   name: 'MenuAdd',
+  components: { Icons },
   props: {
     menuAddVisiable: {
       type: Boolean,
@@ -69,6 +75,7 @@ export default {
   },
   data() {
     return {
+      isShowIcons: false,
       aclCasValue: [],
       cascaderProps: {
         checkStrictly: true,
@@ -106,8 +113,12 @@ export default {
       this.menuAddVisiable = false;
       this.$emit('update:menuAddVisiable', false);
     },
+    getIconName(iconName) {
+      this.isShowIcons = false;
+      this.aclForm.icon = iconName;
+    },
     setIcon() {
-      this.dialogVisible = true;
+      this.isShowIcons = true;
     },
     focus() {
       this.aclmoduleTree();
