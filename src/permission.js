@@ -59,7 +59,8 @@ function filterAsyncRoutes(routes) {
           route.component = () => import('@/layout/index.vue');
           break;
         default:
-          route.component = () => import(`@/views${route.component}.vue`);
+          // route.component = () => import(`@/views${route.component}.vue`);
+          route.component = view(route.component);
           break;
       }
       if (route.children && route.children.length) {
@@ -68,6 +69,11 @@ function filterAsyncRoutes(routes) {
       return true;
     }
   });
+}
+
+function view(path) {
+  console.log(`@/views${path}.vue`);
+  return (resolve) => require([`./views${path}.vue`], resolve);
 }
 
 router.afterEach(() => {
