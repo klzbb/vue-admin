@@ -12,7 +12,7 @@
             <el-button size="mini" type="default" @click="addMenu">菜单</el-button>
             <el-button type="primary" size="mini" @click="addBtn">按钮</el-button>
           </div>
-          <el-button slot="reference" type="primary">新增</el-button>
+          <el-button slot="reference" type="primary">新增111</el-button>
         </el-popover>
       </div>
       <el-table
@@ -66,14 +66,13 @@
         </el-table-column>
       </el-table>
     </div>
-    <!-- 新增菜单 -->
+    <!-- 新增、编辑菜单 -->
     <menu-add
+      :title="title"
+      :form-type="formType"
+      :edit-form="editForm"
       :menu-add-visiable.sync="menuAddVisiable"
       @success="handleMenuAddSuccess"
-    />
-    <menu-edit
-      :visiable.sync="menuEditVisiable"
-      @updateMenu="updateMenu"
     />
   </div>
 </template>
@@ -93,13 +92,17 @@ import {
   userList,
   delUserById
 } from '@/api/index.js';
-import MenuAdd from './components/MenuAdd';
-import MenuEdit from './components/MenuEdit';
+// import MenuAdd from './components/MenuAdd';
+// import MenuEdit from './components/MenuEdit';
 export default {
   name: 'MenuIndex',
-  components: { MenuAdd, MenuEdit },
+  components: {
+    MenuAdd: () => import('./components/MenuAdd.vue')
+  },
   data() {
     return {
+      formType: '1', // 1-新增 2-编辑
+      editForm: {},
       menuAddVisiable: false,
       menuEditVisiable: false,
       activeName: 'second',
@@ -345,25 +348,21 @@ export default {
     },
     handleChange(value) {},
     addMenu() {
+      this.formType = '1';
       this.isShowAdd = false;
       this.menuAddVisiable = true;
-      // this.type = '2';
-      // this.form.status = 1;
-      // this.aclForm.type = 1;
       this.title = '新增菜单';
     },
     addBtn() {
       this.isShowAdd = false;
-      this.title = '新增按钮';
-      this.aclForm.type = 2;
-      this.isShowMenuDialog = true;
     },
     editMenu(row) {
-      this.type = '1';
-      this.aclForm = { ...row };
-      this.aclCasValue = this.levelToArr(row.level);
+      this.formType = '2';
+      const aclCasValue = this.levelToArr(row.level);
+      console.log('aclCasValue=', aclCasValue);
+      this.editForm = { ...row, aclCasValue };
       this.title = '编辑菜单';
-      this.menuEditVisiable = true;
+      this.menuAddVisiable = true;
     },
     levelToArr(level) {
       let result;

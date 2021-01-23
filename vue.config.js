@@ -127,5 +127,8 @@ module.exports = {
           config.optimization.runtimeChunk('single');
         }
       );
+  },
+  css: {
+    extract: false
   }
 };

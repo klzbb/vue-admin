@@ -3,12 +3,12 @@
     <el-drawer
       class="permis"
       title="标题"
-      :visible.sync="menuAddVisiable"
+      :visible="menuAddVisiable"
       :with-header="false"
       :wrapper-closable="false"
-      destroy-on-close
+      @opened="open"
     >
-      <el-form ref="aclForm" class="permis_form" :model="aclForm">
+      <el-form ref="menuForm" class="permis_form" :model="menuForm">
         <div class="permis_title">新增菜单</div>
         <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
           <el-cascader
@@ -17,42 +17,41 @@
             :options="tree"
             :props="cascaderProps"
             placeholder="请选择上级权限模块"
-            @focus="focus"
           />
         </el-form-item>
         <el-form-item prop="name" label="菜单名称" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.name" placeholder="菜单名称" clearable autocomplete="off" />
+          <el-input v-model="menuForm.name" placeholder="菜单名称" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="path" label="Path" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.path" placeholder="请输入菜单URL" clearable autocomplete="off" />
+          <el-input v-model="menuForm.path" placeholder="请输入菜单URL" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="component" label="Component" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.component" placeholder="请输入组件地址" clearable autocomplete="off" />
+          <el-input v-model="menuForm.component" placeholder="请输入组件地址" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="componentName" label="componentName" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.componentName" placeholder="请输入组件名称" clearable autocomplete="off" />
+          <el-input v-model="menuForm.componentName" placeholder="请输入组件名称" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="icon" label="菜单图标" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.icon" placeholder="点击右侧按钮选择图标" clearable autocomplete="off">
+          <el-input v-model="menuForm.icon" placeholder="点击右侧按钮选择图标" clearable autocomplete="off">
             <el-button slot="append" icon="el-icon-setting" @click="setIcon" />
           </el-input>
         </el-form-item>
         <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
-          <el-select v-model="aclForm.status" placeholder="状态" clearable>
+          <el-select v-model="menuForm.status" placeholder="状态" clearable>
             <el-option :value="0" label="冻结" />
             <el-option :value="1" label="正常" />
           </el-select>
         </el-form-item>
         <el-form-item prop="seq" label="菜单顺序" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.seq" placeholder="菜单顺序" clearable autocomplete="off" />
+          <el-input v-model="menuForm.seq" placeholder="菜单顺序" clearable autocomplete="off" />
         </el-form-item>
         <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
-          <el-input v-model="aclForm.remark" placeholder="备注" clearable autocomplete="off" />
+          <el-input v-model="menuForm.remark" placeholder="备注" clearable autocomplete="off" />
         </el-form-item>
       </el-form>
       <div class="menu_add_btns">
         <el-button @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="createMenu">确 定</el-button>
+        <el-button type="primary" @click="submit">确 定</el-button>
       </div>
     </el-drawer>
     <Icons
@@ -62,15 +61,29 @@
   </div>
 </template>
 <script>
-import { aclmoduleAdd, aclmoduleTree } from '@/api/index.js';
+import { aclmoduleAdd, aclmoduleTree, aclmoduleUpdate } from '@/api/index.js';
 import Icons from './Icons.vue';
 export default {
   name: 'MenuAdd',
   components: { Icons },
   props: {
+    title: {
+      type: String,
+      default: '标题'
+    },
     menuAddVisiable: {
       type: Boolean,
       default: false
+    },
+    formType: {
+      type: String, // 1-新增 2-编辑
+      default: '1'
+    },
+    editForm: {
+      type: Object,
+      default: () => {
+        return {};
+      }
     }
   },
   data() {
@@ -86,7 +99,7 @@ export default {
       },
       tree: [],
       formLabelWidth: '120px',
-      aclForm: {
+      menuForm: {
         name: '',
         parent_id: 0,
         component: '',
@@ -100,13 +113,18 @@ export default {
       }
     };
   },
-  mounted() {
-    this.init();
-  },
   methods: {
+    open() {
+      this.init();
+    },
     init() {
       Promise.all([this.aclmoduleTree()])
-        .then(res => {})
+        .then(res => {
+          if (this.formType === '2') {
+            this.menuForm = { ...this.editForm };
+            this.aclCasValue = this.menuForm.aclCasValue;
+          }
+        })
         .catch(e => {});
     },
     cancel() {
@@ -115,13 +133,10 @@ export default {
     },
     getIconName(iconName) {
       this.isShowIcons = false;
-      this.aclForm.icon = iconName;
+      this.menuForm.icon = iconName;
     },
     setIcon() {
       this.isShowIcons = true;
-    },
-    focus() {
-      this.aclmoduleTree();
     },
     async aclmoduleTree() {
       const res = await aclmoduleTree();
@@ -155,12 +170,19 @@ export default {
       }
       return data;
     },
+    async submit() {
+      if (this.formType === '1') {
+        this.createMenu();
+      } else if (this.formType === '2') {
+        this.updateMenu();
+      }
+    },
     /**
      * 创建菜单
      */
     async createMenu() {
       const len = this.aclCasValue.length - 1;
-      this.aclForm.parent_id = this.aclCasValue[len];
+      this.menuForm.parent_id = this.aclCasValue[len];
       const {
         parent_id: parentId,
         name,
@@ -172,7 +194,7 @@ export default {
         icon,
         status,
         remark
-      } = this.aclForm;
+      } = this.menuForm;
       const res = await aclmoduleAdd({
         parentId: parentId || 0,
         name,
@@ -186,10 +208,48 @@ export default {
         remark
       });
       if (res && res.data.code === 0) {
-        this.$refs.aclForm.resetFields();
+        this.$refs.menuForm.resetFields();
         this.aclCasValue = [];
-        this.isShowMenuDialog = false;
         this.$message.success('添加菜单成功');
+        this.$emit('success');
+      }
+    },
+    /**
+     * 更新菜单
+     */
+    async updateMenu() {
+      const len = this.aclCasValue.length - 1;
+      this.menuForm.parent_id = this.aclCasValue[len];
+      const {
+        parent_id: parentId,
+        name,
+        seq,
+        path,
+        type,
+        component,
+        componentName,
+        icon,
+        status,
+        remark,
+        id
+      } = this.menuForm;
+      const updateRes = await aclmoduleUpdate({
+        parent_id: parentId,
+        name,
+        seq,
+        path,
+        type,
+        component,
+        componentName,
+        icon,
+        status,
+        remark,
+        id
+      });
+      if (updateRes && updateRes.data.code === 0) {
+        this.$refs.menuForm.resetFields();
+        this.aclCasValue = [];
+        this.$message.success('更新菜单成功');
         this.$emit('success');
       }
     }
