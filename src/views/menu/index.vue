@@ -1,73 +1,71 @@
 <template>
-  <div class="dept">
-    <div class="dept_dept">
-      <div class="dept_dept_label">
-        <el-popover
-          v-model="isShowAdd"
-          placement="top"
-          trigger="click"
-        >
-          <p>请选择创建类型</p>
-          <div>
-            <el-button size="mini" type="default" @click="addMenu">菜单</el-button>
-            <el-button type="primary" size="mini" @click="addBtn">按钮</el-button>
-          </div>
-          <el-button slot="reference" type="primary">新增111</el-button>
-        </el-popover>
-      </div>
-      <el-table
-        :data="tree"
-        style="width: 100%;margin-bottom: 20px;"
-        row-key="id"
-        border
-        default-expand-all
-        :tree-props="defaultProps"
-        @selection-change="handleSelectionChange"
+  <div class="menu">
+    <div class="menu_filter">
+      <el-popover
+        v-model="isShowAdd"
+        placement="top"
+        trigger="click"
       >
-        <el-table-column
-          type="selection"
-          width="55"
-        />
-        <el-table-column
-          prop="name"
-          label="名称"
-          sortable
-          width="180"
-        />
-
-        <el-table-column
-          prop="type"
-          label="类型"
-          width="80"
-        >
-          <template slot-scope="scope">
-            <div>{{ scope.row.type === 1 ? '菜单' : scope.row.type === 2 ? '按钮' : '其他' }}</div>
-          </template>
-        </el-table-column>
-        <el-table-column
-          prop="seq"
-          label="顺序"
-          width="80"
-        />
-        <el-table-column
-          prop="path"
-          label="地址"
-        />
-        <el-table-column
-          prop="seq"
-          label="操作"
-          fixed="right"
-          width="200"
-        >
-          <template slot-scope="scope">
-            <el-button type="primary" @click="editMenu(scope.row)">编辑</el-button>
-            <el-button type="danger" @click="delMenu(scope.row)">删除</el-button>
-          </template>
-        </el-table-column>
-      </el-table>
+        <p>请选择创建类型</p>
+        <div>
+          <el-button size="mini" type="default" @click="addMenu">菜单</el-button>
+          <el-button type="primary" size="mini" @click="addBtn">按钮</el-button>
+        </div>
+        <el-button slot="reference" type="primary">新增</el-button>
+      </el-popover>
     </div>
+    <el-table
+      :data="tree"
+      style="width: 100%;margin-bottom: 20px;"
+      row-key="id"
+      border
+      default-expand-all
+      :tree-props="defaultProps"
+      @selection-change="handleSelectionChange"
+    >
+      <el-table-column
+        type="selection"
+        width="55"
+      />
+      <el-table-column
+        prop="name"
+        label="名称"
+        sortable
+        width="180"
+      />
+
+      <el-table-column
+        prop="type"
+        label="类型"
+        width="80"
+      >
+        <template slot-scope="scope">
+          <div>{{ scope.row.type === 1 ? '菜单' : scope.row.type === 2 ? '按钮' : '其他' }}</div>
+        </template>
+      </el-table-column>
+      <el-table-column
+        prop="seq"
+        label="顺序"
+        width="80"
+      />
+      <el-table-column
+        prop="path"
+        label="地址"
+      />
+      <el-table-column
+        prop="seq"
+        label="操作"
+        fixed="right"
+        width="200"
+      >
+        <template slot-scope="scope">
+          <el-button type="primary" @click="editMenu(scope.row)">编辑</el-button>
+          <el-button type="danger" @click="delMenu(scope.row)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
     <!-- 新增、编辑菜单 -->
-    <menu-add
+    <menu-form
       :title="title"
       :form-type="formType"
       :edit-form="editForm"
@@ -92,12 +90,10 @@ import {
   userList,
   delUserById
 } from '@/api/index.js';
-// import MenuAdd from './components/MenuAdd';
-// import MenuEdit from './components/MenuEdit';
 export default {
   name: 'MenuIndex',
   components: {
-    MenuAdd: () => import('./components/MenuAdd.vue')
+    MenuForm: () => import('./components/MenuForm.vue')
   },
   data() {
     return {
@@ -170,183 +166,9 @@ export default {
       this.menuAddVisiable = false;
       this.init();
     },
-    iconTab(tab, event) {
-      console.log(tab, event);
-    },
-    /**
-     * 设置图标
-     */
-    setIcon() {
-      this.dialogVisible = true;
-    },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-    aclDel(row) {
-      const {
-        id
-      } = row;
-      this.$confirm('权限点删除后将不可恢复，是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async() => {
-          const res = await aclDel({
-            id
-          });
-          if (res && res.data.code === 0) {
-            this.$message.success('删除成功');
-            this.selectAclListByAclModuleId(this.aclModuleId);
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-    },
-
-    async getLevel(aclModuleId) {
-      const res = await aclmoduleFindLevelById({ aclModuleId });
-      const { level } = res.data.data;
-      let result;
-      if (level.indexOf('.') === -1) {
-        result = [level];
-      } else {
-        result = level.split('.');
-      }
-      result.push(aclModuleId);
-      result.shift();
-      result = result.map(item => parseInt(item));
-      return result;
-    },
-    /**
-       * 根据tree 和 parentId 转化aclCasValue值
-       * @param tree 树状数据结构
-       * @param parentId 当前权限点父级权限模块id
-       * @return array
-       */
-    deepByParentId(tree, parentId) {
-      // 取得parentId所属的顶层权限模块
-      const level = '';
-      const result = [];
-      const temp = tree.filter(item => item.id === parentId);
-      if (temp.length > 0) {
-
-      } else {
-        this.deepByParentId();
-      }
-
-      return result;
-    },
-    nodeClick(data) {
-      const {
-        id: aclModuleId
-      } = data;
-      this.aclModuleId = aclModuleId;
-      this.selectAclListByAclModuleId(aclModuleId);
-    },
-    async selectAclListByAclModuleId(aclModuleId) {
-      const params = {
-        aclModuleId,
-        pageNo: this.pageNo,
-        pageSize: this.pageSize
-      };
-      const res = await aclPageList(params);
-      if (res && res.data.code === 0) {
-        this.userList = res.data.data.data;
-        this.total = res.data.data.total;
-      }
-    },
-    userAdd() {
-      this.aclForm = {};
-      this.aclCasValue = [];
-      this.aclTitle = '添加权限点';
-      this.isShowMenuDialog = true;
-    },
-    /**
-     * 提交按钮
-     */
-    async sure() {
-      if (this.type === '2') {
-        this.createMenu();
-      } else if (this.type === '1') {
-        this.updateMenu();
-      }
-    },
-    /**
-     * 创建菜单
-     */
-    async createMenu() {
-      const len = this.aclCasValue.length - 1;
-      this.aclForm.parent_id = this.aclCasValue[len];
-      const {
-        parent_id: parentId,
-        name,
-        seq,
-        url,
-        type,
-        status,
-        remark
-      } = this.aclForm;
-      const res = await aclmoduleAdd({
-        parentId: parentId || 0,
-        name,
-        seq,
-        url,
-        type,
-        status,
-        remark
-      });
-      if (res && res.data.code === 0) {
-        this.aclForm = {};
-        this.isShowMenuDialog = false;
-        this.$message.success('添加菜单成功');
-        this.init();
-      }
-    },
-    /**
-     * 更新菜单
-     */
-    async updateMenu() {
-      const len = this.aclCasValue.length - 1;
-      this.aclForm.parent_id = this.aclCasValue[len];
-      const {
-        parent_id: parentId,
-        name,
-        seq,
-        url,
-        type,
-        status,
-        remark,
-        id
-      } = this.aclForm;
-      const updateRes = await aclmoduleUpdate({
-        parentId: parentId || 0,
-        name,
-        seq,
-        url,
-        type,
-        status,
-        remark,
-        id
-      });
-      if (updateRes && updateRes.data.code === 0) {
-        this.aclForm = {};
-        this.isShowMenuDialog = false;
-        this.$message.success('更新菜单成功');
-        this.init();
-      }
-    },
-    handleChange(value) {},
     addMenu() {
       this.formType = '1';
       this.isShowAdd = false;
@@ -359,11 +181,13 @@ export default {
     editMenu(row) {
       this.formType = '2';
       const aclCasValue = this.levelToArr(row.level);
-      console.log('aclCasValue=', aclCasValue);
       this.editForm = { ...row, aclCasValue };
       this.title = '编辑菜单';
       this.menuAddVisiable = true;
     },
+    /**
+     * 选中上级模块
+     */
     levelToArr(level) {
       let result;
       if (level.indexOf('.') === -1) {
@@ -392,32 +216,6 @@ export default {
           }
         })
         .catch(() => {});
-    },
-    edit(item) {
-      this.type = '1';
-      this.title = '编辑权限模块';
-      this.form = {
-        ...item
-      };
-      console.log(this.form);
-      this.value = this.formatToValue(item);
-      this.dialogFormVisible = true;
-    },
-    // 选中部门value 值转换 0.23.34 => [23,34]
-    formatToValue(item) {
-      let arr = [];
-      if (item.level.indexOf('.') !== -1) {
-        const tempArr = item.level.split('.');
-        for (let i = 0; i < tempArr.length; i++) {
-          if (tempArr[i] !== '0') {
-            arr.push(parseInt(tempArr[i]));
-          }
-        }
-      } else {
-        arr = [0];
-      }
-      console.log(arr);
-      return arr;
     },
     init() {
       Promise.all([this.aclmoduleTree()])
@@ -461,55 +259,30 @@ export default {
 };
 
 </script>
-<style lang="scss" scoped>
-.dept {
+<style lang="scss">
+.menu {
   position: relative;
   padding: 15px;
 
-  &_dept {
-    width: 100%;
-    &_label {
-      padding: 0 5px;
-      margin-bottom: 10px;
-      color: #fff;
-      line-height: 40px;
+  &_filter {
+    padding: 0 5px;
+    margin-bottom: 10px;
+    color: #fff;
+    line-height: 40px;
 
-      .label {
-        margin-right: 20px;
-      }
-    }
-
-    &_tree_item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex: 1;
-      padding-right: 8px;
-      font-size: 14px;
+    .label {
+      margin-right: 20px;
     }
   }
 
-  &_user {
-    position: absolute;
-    top: 15px;
-    left: 365px;
-    width: 100%;
-    padding-left: 30px;
-
-    &_label {
-      height: 40px;
-      padding: 0 5px;
-      margin-bottom: 10px;
-      color: #fff;
-      line-height: 40px;
-      background-color: #409eff;
-
-      .label {
-        margin-right: 20px;
-      }
-    }
+  &_tree_item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex: 1;
+    padding-right: 8px;
+    font-size: 14px;
   }
-
   // reset element-ui css
   .el-cascader {
     display: block;

@@ -64,35 +64,35 @@ export const constantRoutes = [
       }
     ]
   },
-  {
-    path: '/',
-    component: Layout,
-    redirect: '/dept',
-    meta: { title: '系统设置', icon: 'documentation', noCache: true },
-    children: [
-      {
-        path: 'dept',
-        component: () => import(/* webpackChunkName: "dept" */'@/views/dept/index.vue'),
-        meta: { title: '部门管理', icon: 'documentation', noCache: true }
-      },
-      {
-        path: 'menu',
-        component: () => import(/* webpackChunkName: "menu" */'@/views/menu/index.vue'),
-        meta: { title: '菜单管理', icon: 'documentation', noCache: true }
-      },
-      {
-        path: 'role',
-        component: () => import(/* webpackChunkName: "role" */'@/views/role/index.vue'),
-        meta: { title: '角色管理', icon: 'documentation', noCache: true }
-      },
-      {
-        path: 'user',
-        component: () => import(/* webpackChunkName: "suer" */'@/views/user/index.vue'),
-        meta: { title: '用户管理', icon: 'documentation', noCache: true }
-      }
-    ]
+  // {
+  //   path: '/',
+  //   component: Layout,
+  //   redirect: '/dept',
+  //   meta: { title: '系统设置', icon: 'documentation', noCache: true },
+  //   children: [
+  //     {
+  //       path: 'dept',
+  //       component: () => import(/* webpackChunkName: "dept" */'@/views/dept/index.vue'),
+  //       meta: { title: '部门管理', icon: 'documentation', noCache: true }
+  //     },
+  //     {
+  //       path: 'menu',
+  //       component: () => import(/* webpackChunkName: "menu" */'@/views/menu/index.vue'),
+  //       meta: { title: '菜单管理', icon: 'documentation', noCache: true }
+  //     },
+  //     {
+  //       path: 'role',
+  //       component: () => import(/* webpackChunkName: "role" */'@/views/role/index.vue'),
+  //       meta: { title: '角色管理', icon: 'documentation', noCache: true }
+  //     },
+  //     {
+  //       path: 'user',
+  //       component: () => import(/* webpackChunkName: "suer" */'@/views/user/index.vue'),
+  //       meta: { title: '用户管理', icon: 'documentation', noCache: true }
+  //     }
+  //   ]
 
-  },
+  // },
   {
     path: '/login',
     component: () => import('@/views/login/index'),

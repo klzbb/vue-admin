@@ -1,5 +1,5 @@
 <template>
-  <div class="menu_add">
+  <div class="menu_form">
     <el-drawer
       class="permis"
       title="标题"
@@ -49,7 +49,7 @@
           <el-input v-model="menuForm.remark" placeholder="备注" clearable autocomplete="off" />
         </el-form-item>
       </el-form>
-      <div class="menu_add_btns">
+      <div class="menu_form_btns">
         <el-button @click="cancel">取 消</el-button>
         <el-button type="primary" @click="submit">确 定</el-button>
       </div>
@@ -258,7 +258,7 @@ export default {
 };
 </script>
 <style lang="scss">
-.menu_add {
+.menu_form {
   .permis_title {
     position: relative;
     margin-bottom: 20px;
