@@ -101,7 +101,7 @@ export default {
       formLabelWidth: '120px',
       menuForm: {
         name: '',
-        parent_id: 0,
+        parentId: 0,
         component: '',
         componentName: '',
         icon: '',
@@ -182,9 +182,9 @@ export default {
      */
     async createMenu() {
       const len = this.aclCasValue.length - 1;
-      this.menuForm.parent_id = this.aclCasValue[len];
+      this.menuForm.parentId = this.aclCasValue[len];
       const {
-        parent_id: parentId,
+        parentId,
         name,
         seq,
         path,
@@ -219,9 +219,9 @@ export default {
      */
     async updateMenu() {
       const len = this.aclCasValue.length - 1;
-      this.menuForm.parent_id = this.aclCasValue[len];
+      this.menuForm.parentId = this.aclCasValue[len];
       const {
-        parent_id: parentId,
+        parentId,
         name,
         seq,
         path,
@@ -234,7 +234,7 @@ export default {
         id
       } = this.menuForm;
       const updateRes = await aclmoduleUpdate({
-        parent_id: parentId,
+        parentId: parentId || 0,
         name,
         seq,
         path,
