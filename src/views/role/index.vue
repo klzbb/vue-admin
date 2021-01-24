@@ -256,6 +256,7 @@ export default {
       this.type = '2';
       this.title = '新增角色';
       this.drawer = true;
+      this.$refs.roleForm.resetFields();
     },
     userSearch() {
 
