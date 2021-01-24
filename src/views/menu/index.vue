@@ -77,18 +77,7 @@
 <script>
 import {
   aclmoduleTree,
-  menuDel,
-  aclmoduleAdd,
-  aclmoduleUpdate,
-  aclAdd,
-  aclDel,
-  aclUpdate,
-  aclPageList,
-  aclmoduleFindLevelById,
-  deptUpdate,
-  register,
-  userList,
-  delUserById
+  menuDel
 } from '@/api/index.js';
 export default {
   name: 'MenuIndex',
@@ -100,32 +89,11 @@ export default {
       formType: '1', // 1-新增 2-编辑
       editForm: {},
       menuAddVisiable: false,
-      menuEditVisiable: false,
       activeName: 'second',
-      dialogVisible: false,
       isShowAdd: false,
-      aclModuleId: '',
-      pageNo: 1,
-      pageSize: 10,
-      userList: [],
-      total: 0,
-      isShowMenuDialog: false,
       aclCasValue: [],
-      aclForm: {
-        name: '',
-        parent_id: 0,
-        component: '',
-        icon: '',
-        url: '',
-        type: '',
-        status: 1,
-        seq: '',
-        remark: ''
-      },
       type: '1', // 1-编辑部门 2-新增部门
       title: '添加权限模块',
-      currentDept: {},
-      deptList: [],
       value: [],
       options: [],
       tree: [],
@@ -133,8 +101,6 @@ export default {
         children: 'children',
         hasChildren: 'hasChildren'
       },
-      dialogTableVisible: false,
-      dialogFormVisible: false,
       form: {
         value: [],
         parent_id: 0,
@@ -142,21 +108,8 @@ export default {
         seq: '',
         status: 1,
         remark: ''
-      },
-      formLabelWidth: '120px',
-      cascaderProps: {
-        checkStrictly: true,
-        value: 'id',
-        expandTrigger: 'hover',
-        children: 'children',
-        label: 'name'
       }
     };
-  },
-  watch: {
-    aclCasValue(cur, old) {
-      console.log(cur);
-    }
   },
   mounted() {
     this.init();
