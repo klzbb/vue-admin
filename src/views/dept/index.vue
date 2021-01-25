@@ -1,11 +1,13 @@
 <template>
   <div class="dept">
     <div class="dept_dept">
-      <div class="dept_dept_label">
-        <span class="label">部门列表</span>
-        <i class="el-icon-circle-plus-outline" @click="addDept" />
+      <div class="role_filter">
+        <el-form :inline="true" :model="formInline" class="demo-form-inline">
+          <el-form-item>
+            <el-button type="primary" @click="addDept">新增</el-button>
+          </el-form-item>
+        </el-form>
       </div>
-
       <el-table
         :data="tree"
         style="width: 100%;margin-bottom: 20px;"
@@ -41,85 +43,45 @@
         </el-table-column>
       </el-table>
     </div>
-    <el-dialog
-      ref="deptForm"
-      width="800px"
-      :modal-append-to-body="false"
-      :title="title"
-      :visible.sync="dialogFormVisible"
-    >
-      <el-form ref="elForm" :model="form">
-        <el-form-item prop="value" label="上级部门" :label-width="formLabelWidth">
-          <el-cascader
-            v-model="value"
-            :clearable="true"
-            :options="deptList"
-            :props="cascaderProps"
-            placeholder="请选择上级部门"
-            @change="handleChange"
-          />
-        </el-form-item>
-        <el-form-item prop="name" label="名称" :label-width="formLabelWidth">
-          <el-input v-model="form.name" :clearable="true" autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="seq" label="顺序" :label-width="formLabelWidth">
-          <el-input v-model="form.seq" :clearable="true" autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
-          <el-input v-model="form.remark" :clearable="true" autocomplete="off" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="sure">确 定</el-button>
-      </div>
-    </el-dialog>
+    <!-- @open="open" -->
 
-    <el-dialog
-      width="800px"
-      :modal-append-to-body="false"
-      :title="userTitle"
-      :visible.sync="userVisible"
+    <el-drawer
+      :title="title"
+      :visible="dialogFormVisible"
+      :with-header="false"
+      :wrapper-closable="false"
     >
-      <el-form ref="userForm" :model="userForm">
-        <el-form-item prop="value" label="上级部门" :label-width="formLabelWidth">
-          <el-cascader
-            v-model="userDeptList"
-            :clearable="true"
-            :options="tree"
-            :props="cascaderProps"
-            placeholder="请选择上级部门"
-            @change="handleChange"
-          />
-        </el-form-item>
-        <el-form-item prop="username" label="用户名" :label-width="formLabelWidth">
-          <el-input v-model="userForm.username" placeholder="用户名" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="password" label="密码" :label-width="formLabelWidth">
-          <el-input v-model="userForm.password" placeholder="密码" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="telephone" label="电话号码" :label-width="formLabelWidth">
-          <el-input v-model="userForm.telephone" placeholder="电话号码" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="mail" label="邮箱" :label-width="formLabelWidth">
-          <el-input v-model="userForm.mail" placeholder="邮箱" clearable autocomplete="off" />
-        </el-form-item>
-        <el-form-item prop="status" label="状态" :label-width="formLabelWidth">
-          <el-select v-model="userForm.status" placeholder="状态" clearable>
-            <el-option :value="0" label="禁用" />
-            <el-option :value="1" label="正常" />
-            <el-option :value="2" label="冻结" />
-          </el-select>
-        </el-form-item>
-        <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
-          <el-input v-model="userForm.remark" placeholder="备注" clearable autocomplete="off" />
-        </el-form-item>
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="cancel">取 消</el-button>
-        <el-button type="primary" @click="submit">确 定</el-button>
+      <div class="dept_form">
+        <div class="dept_form_title">{{ title }}</div>
+        <el-form ref="elForm" :model="form">
+          <el-form-item prop="value" label="上级部门" :label-width="formLabelWidth">
+            <el-cascader
+              v-model="value"
+              :clearable="true"
+              :options="deptList"
+              :props="cascaderProps"
+              placeholder="请选择上级部门"
+              @change="handleChange"
+            />
+          </el-form-item>
+          <el-form-item prop="name" label="名称" :label-width="formLabelWidth">
+            <el-input v-model="form.name" :clearable="true" autocomplete="off" />
+          </el-form-item>
+          <el-form-item prop="seq" label="顺序" :label-width="formLabelWidth">
+            <el-input v-model="form.seq" :clearable="true" autocomplete="off" />
+          </el-form-item>
+          <el-form-item prop="remark" label="备注" :label-width="formLabelWidth">
+            <el-input v-model="form.remark" :clearable="true" autocomplete="off" />
+          </el-form-item>
+        </el-form>
+        <div class="dept_form_btns">
+          <el-button @click="cancel">取 消</el-button>
+          <el-button type="primary" @click="sure">确 定</el-button>
+        </div>
       </div>
-    </el-dialog>
+
+    </el-drawer>
+
   </div>
 </template>
 <script>
@@ -136,6 +98,7 @@ export default {
   name: 'Dept',
   data() {
     return {
+      formInline: {},
       deptId: '',
       pageNo: 1,
       pageSize: 10,
@@ -188,81 +151,11 @@ export default {
   },
   methods: {
     cancel() {
-      this.userVisible = false;
+      this.$refs.elForm.resetFields();
+      this.value = [0];
+      this.dialogFormVisible = false;
     },
-    handleSizeChange(val) {
-      console.log(`每页 ${val} 条`);
-    },
-    handleCurrentChange(val) {
-      console.log(`当前页: ${val}`);
-    },
-    userDel(row) {
-      const { id } = row;
-      this.$confirm('用户删除后将不可恢复，是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async() => {
-          const res = await delUserById({
-            id
-          });
-          if (res && res.data.code === 0) {
-            this.$message.success('删除成功');
-            this.selectUserListByDeptId(this.deptId);
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-    },
-    userEdit(row) {},
-    nodeClick(data) {
-      const { id: deptId } = data;
-      this.deptId = deptId;
-      this.selectUserListByDeptId(deptId);
-    },
-    async selectUserListByDeptId(deptId) {
-      const params = {
-        deptId,
-        pageNo: this.pageNo,
-        pageSize: this.pageSize
-      };
-      const res = await userList(params);
-      if (res && res.data.code === 0) {
-        this.userList = res.data.data.data;
-        this.total = res.data.data.total;
-      }
-    },
-    userAdd() {
-      this.userForm = {};
-      this.userDeptList = [];
-      this.userTitle = '添加用户';
-      this.userVisible = true;
-    },
-    async submit() {
-      console.log(this.value);
-      const len = this.userDeptList.length - 1;
-      this.userForm.deptId = this.userDeptList[len];
-      const { username, telephone, password, mail, status, remark, deptId } = this.userForm;
-      const res = await register({
-        username,
-        telephone,
-        password,
-        mail,
-        status,
-        remark,
-        deptId
-      });
-      if (res && res.data.code === 0) {
-        this.userVisible = false;
-        this.$message.success('用户注册成功');
-        if (this.deptId) this.selectUserListByDeptId(this.deptId);
-      }
-    },
+
     async sure() {
       if (this.type === '2') {
         console.log(this.value);
@@ -327,13 +220,15 @@ export default {
         });
     },
     edit(item) {
-      this.type = '1';
-      this.title = '编辑部门';
-      this.form = {
-        ...item
-      };
-      this.value = this.formatToValue(item);
       this.dialogFormVisible = true;
+      this.$nextTick(() => {
+        this.type = '1';
+        this.title = '编辑部门';
+        this.form = {
+          ...item
+        };
+        this.value = this.formatToValue(item);
+      });
     },
     // 选中部门value 值转换 0.23.34 => [23,34]
     formatToValue(item) {
@@ -420,24 +315,16 @@ export default {
     }
   }
 
-  &_user {
-    width: 100%;
-    position: absolute;
-    top: 15px;
-    left: 365px;
-    padding-left: 30px;
-
-    &_label {
-      background-color: #409eff;
-      color: #fff;
-      height: 40px;
-      line-height: 40px;
-      padding: 0 5px;
-      margin-bottom: 10px;
-
-      .label {
-        margin-right: 20px;
-      }
+  &_form{
+    padding: 0 10px 20px;
+    &_title{
+      position: relative;
+      margin-bottom: 20px;
+      line-height: 60px;
+    }
+    &_btns{
+      text-align: right;
+      padding-right:20px;
     }
   }
 
