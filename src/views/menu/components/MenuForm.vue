@@ -2,14 +2,13 @@
   <div class="menu_form">
     <el-drawer
       class="permis"
-      title="标题"
       :visible="menuAddVisiable"
       :with-header="false"
       :wrapper-closable="false"
       @opened="open"
     >
       <el-form ref="menuForm" class="permis_form" :model="menuForm">
-        <div class="permis_title">新增菜单</div>
+        <div class="permis_title">{{ title }}</div>
         <el-form-item prop="value" label="上级模块" :label-width="formLabelWidth">
           <el-cascader
             v-model="aclCasValue"
@@ -64,7 +63,7 @@
 import { aclmoduleAdd, aclmoduleTree, aclmoduleUpdate } from '@/api/index.js';
 import Icons from './Icons.vue';
 export default {
-  name: 'MenuAdd',
+  name: 'MenuForm',
   components: { Icons },
   props: {
     title: {
@@ -128,7 +127,6 @@ export default {
         .catch(e => {});
     },
     cancel() {
-      this.menuAddVisiable = false;
       this.$emit('update:menuAddVisiable', false);
     },
     getIconName(iconName) {

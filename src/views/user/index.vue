@@ -73,64 +73,13 @@
       :total="total"
       @current-change="handleCurrentChange"
     />
-    <el-drawer
-      title="标题"
-      :visible.sync="drawer"
-      :with-header="false"
-    >
-      <div class="user_form">
-        <div class="user_form_title">{{ title }}</div>
-        <el-form ref="form" :model="form" label-width="80px">
-          <el-form-item label="用户名称">
-            <el-input v-model="form.username" clearable placeholder="请填写用户名称" />
-          </el-form-item>
-          <el-form-item label="手机号码">
-            <el-input v-model="form.telephone" clearable placeholder="请填写手机号码" />
-          </el-form-item>
-          <el-form-item label="邮箱号码">
-            <el-input v-model="form.mail" clearable placeholder="请填写邮箱号码" />
-          </el-form-item>
-          <el-form-item v-if="form.type === '1'" label="账号密码">
-            <el-input v-model="form.password" type="password" clearable placeholder="请填写账号密码" />
-          </el-form-item>
-          <el-form-item label="部门">
-            <el-cascader
-              v-model="deptValue"
-              clearable
-              :options="deptTreeList"
-              :props="deptProps"
-              placeholder="请选择部门"
-              @change="handleChange"
-            />
-          </el-form-item>
-          <el-form-item label="角色">
-            <el-select v-model="selectedRoles" multiple placeholder="请选择角色">
-              <el-option
-                v-for="item in roles"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="用户状态">
-            <el-select v-model="form.status" clearable placeholder="请选择用户状态">
-              <el-option label="无效" :value="0" />
-              <el-option label="正常" :value="1" />
-              <el-option label="冻结" :value="2" />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="备注">
-            <el-input v-model="form.remark" clearable type="textarea" />
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="drawer = false">取消</el-button>
-            <el-button type="primary" @click="submit">确定</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
-
-    </el-drawer>
+    <user-form
+      :title="title"
+      :form-type="formType"
+      :edit-form="editForm"
+      :is-show.sync="isShow"
+      @success="handleSuccess"
+    />
   </div>
 </template>
 
@@ -144,141 +93,54 @@ import {
   delUserById,
   updateById
 } from '@/api/index.js';
+import UserForm from './components/UserForm.vue';
 export default {
   name: 'UserList',
+  components: { UserForm },
   data() {
     return {
+      title: '',
+      isShow: false,
+      formType: '1', // 1-新增 2-编辑
+      editForm: {},
       selectedRoles: [],
       roles: [],
       total: 0,
       pageNo: 1,
       pageSize: 15,
       userList: [],
-      deptProps: {
-        children: 'deptList',
-        label: 'name',
-        value: 'id'
-      },
+
       deptTreeList: [],
       options: [],
       deptValue: '',
-      title: '新增用户',
       formInline: {
         user: '',
         region: ''
       },
-      form: {
-        id: '',
-        type: '1', // 表单类型 1-新增 2-编辑
-        username: '',
-        password: '123444',
-        telephone: '',
-        mail: '',
-        deptId: '',
-        status: 1,
-        remark: ''
-      },
+
       drawer: false
     };
-  },
-  watch: {
-    deptValue(cur, old) {
-      console.log(cur);
-    }
   },
   mounted() {
     this.init();
   },
   methods: {
-    async roleList() {
-      const res = await roleList();
-      if (res && res.data.code === 0) {
-        this.roles = res.data.data;
-      }
+    handleSuccess() {
+      this.isShow = false;
+      this.init();
     },
+
     handleCurrentChange(val) {
       this.pageNo = val;
       this.userAll();
     },
     userAdd() {
+      this.formType = '1';
       this.title = '新增用户';
-      this.drawer = true;
+      this.isShow = true;
     },
     userSearch() {
 
-    },
-    async deptTree() {
-      const res = await deptTree();
-      if (res && res.data.code === 0) {
-        const tree = res.data.data;
-        this.deptTreeList = this.getTreeData(tree);
-        return res;
-      }
-    },
-    // 递归判断列表，把最后的children设为undefined
-    getTreeData(data) {
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].deptList.length < 1) {
-          data[i].deptList = undefined;
-        } else {
-          this.getTreeData(data[i].deptList);
-        }
-      }
-      return data;
-    },
-    handleChange(value) {
-      console.log(value);
-    },
-    async submit() {
-      const { type } = this.form;
-      if (type === '1') {
-        this.register();
-      } else if (type === '2') {
-        this.updateById();
-      }
-    },
-    async updateById() {
-      const len = this.deptValue.length - 1;
-      this.form.deptId = this.deptValue[len];
-      const { username, telephone, password, mail, status, remark, deptId, id } = this.form;
-      const rolesStr = this.selectedRoles.join(',');
-      const res = await updateById({
-        id,
-        username,
-        telephone,
-        password,
-        mail,
-        status,
-        remark,
-        deptId,
-        rolesStr
-      });
-      if (res && res.data.code === 0) {
-        this.drawer = false;
-        this.$message.success('用户修改成功');
-        this.init();
-      }
-    },
-    async register() {
-      const len = this.deptValue.length - 1;
-      this.form.deptId = this.deptValue[len];
-      const { username, telephone, password, mail, status, remark, deptId } = this.form;
-      const rolesStr = this.selectedRoles.join(',');
-      const res = await register({
-        username,
-        telephone,
-        password,
-        mail,
-        status,
-        remark,
-        deptId,
-        rolesStr
-      });
-      if (res && res.data.code === 0) {
-        this.drawer = false;
-        this.$message.success('用户注册成功');
-        this.init();
-      }
     },
     async userAll() {
       const res = await userAll({ pageNo: this.pageNo, pageSize: this.pageSize });
@@ -290,33 +152,14 @@ export default {
     },
     editUser(row) {
       this.title = '编辑用户';
-      this.drawer = true;
-      this.form = { type: '2', ...row };
-      this.selectedRoles = (row.roleIds && row.roleIds.split(',').map(item => parseInt(item))) || [];
-      this.setDeptIds(this.deptTreeList, row.deptId);
+      this.formType = '2';
+      this.isShow = true;
+      this.$nextTick(() => {
+        const selectedRoles = (row.roleIds && row.roleIds.split(',').map(item => parseInt(item))) || [];
+        this.editForm = { type: '2', ...row, selectedRoles };
+      });
     },
-    /**
-     * 设置选中部门
-     */
-    setDeptIds(deptList, currentDeptId) {
-      for (let i = 0; i < deptList.length; i++) {
-        // console.log('item==', deptList[i]);
-        if (deptList[i].id === currentDeptId) {
-          console.log(deptList[i].level);
-          if (deptList[i].level.indexOf('.') !== -1) {
-            let arr = [];
-            arr = deptList[i].level.split('.').map(item => parseInt(item));
-            arr.shift();
-            arr.push(currentDeptId);
-            this.deptValue = arr;
-          } else {
-            this.deptValue = [currentDeptId];
-          }
-        } else if (deptList[i].deptList && deptList[i].deptList.length > 0) {
-          this.setDeptIds(deptList[i].deptList, currentDeptId);
-        }
-      }
-    },
+
     delUser(row) {
       const { id } = row;
       this.$confirm('用户删除后将不可恢复，是否继续?', '提示', {
@@ -341,7 +184,7 @@ export default {
         });
     },
     init() {
-      Promise.all([this.deptTree(), this.userAll(), this.roleList()])
+      Promise.all([this.userAll()])
         .then(res => {
 
         })
