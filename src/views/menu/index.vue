@@ -76,7 +76,7 @@
 </template>
 <script>
 import {
-  aclmoduleTree,
+  menuTree,
   menuDel
 } from '@/api/index.js';
 export default {
@@ -171,13 +171,13 @@ export default {
         .catch(() => {});
     },
     init() {
-      Promise.all([this.aclmoduleTree()])
+      Promise.all([this.menuTree()])
         .then(res => {})
         .catch(e => {});
     },
 
-    async aclmoduleTree() {
-      const res = await aclmoduleTree();
+    async menuTree() {
+      const res = await menuTree();
       if (res && res.data.code === 0) {
         const tree = res.data.data;
         this.tree = this.getTreeData(tree);

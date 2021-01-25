@@ -62,7 +62,7 @@
   </div>
 </template>
 <script>
-import { aclmoduleAdd, aclmoduleTree, aclmoduleUpdate, deptTree, roleList, updateById, register } from '@/api/index.js';
+import { deptTree, roleList, updateById, register, menuTree } from '@/api/index.js';
 export default {
   name: 'UserForm',
   props: {
@@ -208,8 +208,8 @@ export default {
     setIcon() {
       this.isShowIcons = true;
     },
-    async aclmoduleTree() {
-      const res = await aclmoduleTree();
+    async menuTree() {
+      const res = await menuTree();
       if (res && res.data.code === 0) {
         const tree = res.data.data;
         this.tree = this.getTreeData(tree);

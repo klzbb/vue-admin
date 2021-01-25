@@ -66,9 +66,10 @@
       @current-change="handleCurrentChange"
     />
     <el-drawer
-      title="标题"
-      :visible.sync="drawer"
+      :visible="drawer"
       :with-header="false"
+      :wrapper-closable="false"
+      @open="open"
     >
       <div class="role_form">
         <div class="role_form_title">{{ title }}</div>
@@ -86,10 +87,10 @@
           <el-form-item label="备注" prop="remark">
             <el-input v-model="form.remark" clearable type="textarea" />
           </el-form-item>
-          <el-form-item label="权限选择" prop="menuTree">
+          <el-form-item label="权限选择">
             <el-tree
               ref="tree"
-              :data="form.menuTree"
+              :data="menuTree"
               show-checkbox
               check-strictly
               node-key="id"
@@ -103,7 +104,6 @@
           </el-form-item>
         </el-form>
       </div>
-
     </el-drawer>
   </div>
 </template>
@@ -116,6 +116,7 @@ import {
   roleTree,
   roleMenuSave,
   roleUpdate,
+  menuTree,
   deptTree,
   register,
   userAll,
@@ -137,7 +138,6 @@ export default {
       total: 0,
       pageNo: 1,
       pageSize: 15,
-      userList: [],
       deptProps: {
         children: 'deptList',
         label: 'name',
@@ -145,7 +145,6 @@ export default {
       },
       deptTreeList: [],
       options: [],
-      deptValue: '',
       title: '新增用户',
       formInline: {
         menuTree: [],
@@ -153,6 +152,7 @@ export default {
         region: ''
       },
       form: {
+        menuTree: [],
         id: '',
         name: '',
         status: 1,
@@ -161,25 +161,50 @@ export default {
       drawer: false
     };
   },
-  watch: {
-    deptValue(cur, old) {
-      console.log(cur);
-    }
-  },
   mounted() {
     this.init();
   },
   methods: {
+    open() {
+      if (this.type === '2') {
+        this.checkedArr = [];
+        this.getMenuTree();
+      }
+    },
+    async getMenuTree() {
+      const res = await menuTree();
+      if (res && res.data.code === 0) {
+        const tree = res.data.data;
+        this.menuTree = this.getTreeData(tree);
+      }
+    },
+    /**
+     * 递归树状结构将children为([])空时，变为undefined
+     * @return{Array} data
+     */
+    getTreeData(data) {
+      for (var i = 0; i < data.length; i++) {
+        if (data[i].children.length < 1) {
+          // children若为空数组，则将children设为undefined
+          data[i].children = undefined;
+        } else {
+          // children若不为空数组，则继续 递归调用 本方法
+          this.getTreeData(data[i].children);
+        }
+      }
+      return data;
+    },
     cancel() {
-      this.$refs['roleForm'].resetFields();
+      this.$refs.roleForm.resetFields();
       this.checkedArr = [];
-
-      this.drawer = false;
+      this.$nextTick(() => {
+        this.drawer = false;
+      });
     },
     editRole(row) {
+      this.type = '1';
       this.drawer = true;
       this.$nextTick(() => {
-        this.type = '1';
         this.title = '编辑角色';
         this.form = { ...row };
         this.checkedArr = [];
@@ -196,7 +221,6 @@ export default {
       if (res && res.data.code === 0) {
         const list = res.data.data;
         this.menuTree = list;
-        this.form.menuTree = list;
         this.checkedArr = this.deepForChecked(list);
       }
     },
@@ -228,14 +252,14 @@ export default {
         _this.menuTree;
         const menuIds = _this.$refs.tree.getCheckedNodes().map(item => item.id).join(',');
         const res = await roleAdd({ ..._this.form, menuIds });
-        _this.form = {};
+        _this.$refs.roleForm.resetFields();
         _this.drawer = false;
         _this.$message.success('添加角色成功');
         _this.init();
       } else if (_this.type === '1') {
         const menuIds = _this.$refs.tree.getCheckedNodes().map(item => item.id).join(',');
         const res = await roleUpdate({ ..._this.form, menuIds });
-        _this.form = {};
+        _this.$refs.roleForm.resetFields();
         _this.drawer = false;
         _this.$message.success('更新角色成功');
         _this.init();
@@ -256,59 +280,9 @@ export default {
       this.type = '2';
       this.title = '新增角色';
       this.drawer = true;
-      this.$refs.roleForm.resetFields();
     },
     userSearch() {
 
-    },
-    async deptTree() {
-      const res = await deptTree();
-      if (res && res.data.code === 0) {
-        const tree = res.data.data;
-        this.deptTreeList = this.getTreeData(tree);
-        return res;
-      }
-    },
-    // 递归判断列表，把最后的children设为undefined
-    getTreeData(data) {
-      for (var i = 0; i < data.length; i++) {
-        if (data[i].deptList.length < 1) {
-          data[i].deptList = undefined;
-        } else {
-          this.getTreeData(data[i].deptList);
-        }
-      }
-      return data;
-    },
-    handleChange(value) {
-      console.log(value);
-    },
-    async register() {
-      const len = this.deptValue.length - 1;
-      this.form.deptId = this.deptValue[len];
-      const { username, telephone, password, mail, status, remark, deptId } = this.form;
-      const res = await register({
-        username,
-        telephone,
-        password,
-        mail,
-        status,
-        remark,
-        deptId
-      });
-      if (res && res.data.code === 0) {
-        this.drawer = false;
-        this.$message.success('用户注册成功');
-        this.init();
-      }
-    },
-    async userAll() {
-      const res = await userAll({ pageNo: this.pageNo, pageSize: this.pageSize });
-      if (res && res.data.code === 0) {
-        this.userList = res.data.data.data;
-        this.total = res.data.data.total;
-        return res;
-      }
     },
 
     delRole(row) {

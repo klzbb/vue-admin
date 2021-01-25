@@ -94,61 +94,36 @@ export const logout = () => axios({
   method: 'get'
 });
 
-// 权限模块树
-export const aclmoduleTree = () => axios({
+// 菜单树
+export const menuTree = () => axios({
   url: '/app/menu/tree',
   method: 'post'
 });
 
-// 权限模块add
-export const aclmoduleAdd = params => axios({
+// 新增菜单
+export const menuAdd = params => axios({
   url: '/app/menu/add',
   method: 'post',
   data: formUtil(params)
 });
 
-// 权限模块update
-export const aclmoduleUpdate = params => axios({
+// 更新菜单
+export const menuUpdate = params => axios({
   url: '/app/menu/update',
   method: 'post',
   data: formUtil(params)
 });
 
-// 权限模块level
-export const aclmoduleFindLevelById = params => axios({
+// 查询菜单Level
+export const findMenuLevelById = params => axios({
   url: '/app/menu/findLevelById',
   method: 'post',
   data: formUtil(params)
 });
 
-// 权限模块delete
+// 删除菜单
 export const menuDel = params => axios({
   url: '/app/menu/del',
-  method: 'post',
-  data: formUtil(params)
-});
-
-// 权限点add
-export const aclAdd = (params) => axios({
-  url: '/app/acl/add',
-  method: 'post',
-  data: formUtil(params)
-});
-// 权限点update
-export const aclUpdate = (params) => axios({
-  url: '/app/acl/update',
-  method: 'post',
-  data: formUtil(params)
-});
-// 权限点delete
-export const aclDel = (params) => axios({
-  url: '/app/acl/del',
-  method: 'post',
-  data: formUtil(params)
-});
-// 权限点分页
-export const aclPageList = (params) => axios({
-  url: '/app/acl/pagelist',
   method: 'post',
   data: formUtil(params)
 });

@@ -140,15 +140,11 @@
 </template>
 <script>
 import {
-  aclmoduleTree,
+  menuTree,
   menuDel,
-  aclmoduleAdd,
-  aclmoduleUpdate,
-  aclAdd,
-  aclDel,
-  aclUpdate,
-  aclPageList,
-  aclmoduleFindLevelById,
+  menuAdd,
+  menuUpdate,
+  findMenuLevelById,
   deptUpdate,
   register,
   userList,
@@ -210,11 +206,6 @@ export default {
       }
     };
   },
-  watch: {
-    aclCasValue(cur, old) {
-      console.log(cur);
-    }
-  },
   mounted() {
     this.init();
   },
@@ -237,43 +228,9 @@ export default {
     handleCurrentChange(val) {
       console.log(`当前页: ${val}`);
     },
-    aclDel(row) {
-      const {
-        id
-      } = row;
-      this.$confirm('权限点删除后将不可恢复，是否继续?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      })
-        .then(async() => {
-          const res = await aclDel({
-            id
-          });
-          if (res && res.data.code === 0) {
-            this.$message.success('删除成功');
-            this.selectAclListByAclModuleId(this.aclModuleId);
-          }
-        })
-        .catch(() => {
-          this.$message({
-            type: 'info',
-            message: '已取消删除'
-          });
-        });
-    },
-    async aclEdit(row) {
-      this.aclForm = {
-        ...row
-      };
-      this.aclTitle = '编辑权限点';
-      this.aclCasValue = [8, 9];
-      // this.aclCasValue = await this.getLevel(row.acl_module_id)
-      console.log(this.aclCasValue);
-      this.isShowMenuDialog = true;
-    },
+
     async getLevel(aclModuleId) {
-      const res = await aclmoduleFindLevelById({ aclModuleId });
+      const res = await findMenuLevelById({ aclModuleId });
       const { level } = res.data.data;
       let result;
       if (level.indexOf('.') === -1) {
@@ -312,18 +269,7 @@ export default {
       this.aclModuleId = aclModuleId;
       this.selectAclListByAclModuleId(aclModuleId);
     },
-    async selectAclListByAclModuleId(aclModuleId) {
-      const params = {
-        aclModuleId,
-        pageNo: this.pageNo,
-        pageSize: this.pageSize
-      };
-      const res = await aclPageList(params);
-      if (res && res.data.code === 0) {
-        this.userList = res.data.data.data;
-        this.total = res.data.data.total;
-      }
-    },
+
     userAdd() {
       this.aclForm = {};
       this.aclCasValue = [];
@@ -355,7 +301,7 @@ export default {
         status,
         remark
       } = this.aclForm;
-      const res = await aclmoduleAdd({
+      const res = await menuAdd({
         parentId: parentId || 0,
         name,
         seq,
@@ -387,7 +333,7 @@ export default {
         remark,
         id
       } = this.aclForm;
-      const updateRes = await aclmoduleUpdate({
+      const updateRes = await menuUpdate({
         parentId: parentId || 0,
         name,
         seq,
@@ -487,13 +433,13 @@ export default {
       return arr;
     },
     init() {
-      Promise.all([this.aclmoduleTree()])
+      Promise.all([this.menuTree()])
         .then(res => {})
         .catch(e => {});
     },
 
-    async aclmoduleTree() {
-      const res = await aclmoduleTree();
+    async menuTree() {
+      const res = await menuTree();
       if (res && res.data.code === 0) {
         const tree = res.data.data;
         this.tree = this.getTreeData(tree);

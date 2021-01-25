@@ -60,7 +60,7 @@
   </div>
 </template>
 <script>
-import { aclmoduleAdd, aclmoduleTree, aclmoduleUpdate } from '@/api/index.js';
+import { menuAdd, menuTree, menuUpdate } from '@/api/index.js';
 import Icons from './Icons.vue';
 export default {
   name: 'MenuForm',
@@ -117,7 +117,7 @@ export default {
       this.init();
     },
     init() {
-      Promise.all([this.aclmoduleTree()])
+      Promise.all([this.menuTree()])
         .then(res => {
           if (this.formType === '2') {
             this.menuForm = { ...this.editForm };
@@ -136,8 +136,8 @@ export default {
     setIcon() {
       this.isShowIcons = true;
     },
-    async aclmoduleTree() {
-      const res = await aclmoduleTree();
+    async menuTree() {
+      const res = await menuTree();
       if (res && res.data.code === 0) {
         const tree = res.data.data;
         this.tree = this.getTreeData(tree);
@@ -193,7 +193,7 @@ export default {
         status,
         remark
       } = this.menuForm;
-      const res = await aclmoduleAdd({
+      const res = await menuAdd({
         parentId: parentId || 0,
         name,
         seq,
@@ -231,7 +231,7 @@ export default {
         remark,
         id
       } = this.menuForm;
-      const updateRes = await aclmoduleUpdate({
+      const updateRes = await menuUpdate({
         parentId: parentId || 0,
         name,
         seq,
