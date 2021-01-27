@@ -8,6 +8,8 @@
     "dev": "vue-cli-service serve --mode dev",
     "lint": "eslint --ext .js,.vue src",
     "build:prod": "vue-cli-service build",
+    "buildAnal": "vue-cli-service build --mode buildAnal",
+    "buildPro": "vue-cli-service build --mode buildPro",
     "build:stage": "vue-cli-service build --mode staging",
     "preview": "node build/index.js --preview",
     "new": "plop",
