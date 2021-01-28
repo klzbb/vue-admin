@@ -78,8 +78,14 @@ function view(path, componentName) {
   // };
   // return r => require.ensure([], () => r(require(`@/views${path}.vue`)));
   // return (resolve) => require([`@/views${path}`], resolve);
+
   return function(resolve) {
-    import(`@/views${path}.vue`).then(mod => {
+    import(
+      /* webpackChunkName: "[request]" */
+      /* webpackIgnore: "false" */
+
+      `@/views${path}.vue`
+    ).then(mod => {
       resolve(mod);
     });
   };
