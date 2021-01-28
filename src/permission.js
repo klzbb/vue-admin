@@ -76,10 +76,19 @@ function view(path, componentName) {
   if (process.env.NODE_ENV === 'development') {
     return (resolve) => require([`@/views${path}.vue`], resolve);
   } else {
-    return (path) => import(
-      /* webpackChunkName: "[request]" */
-      `@/views${path}.vue`
-    );
+    // return (path) => import(
+    //   /* webpackChunkName: "[request]" */
+    //   `@/views${path}.vue`
+    // );
+    return function(resolve) {
+      import(
+        /* webpackChunkName: "[request]" */
+        `@/views${path}.vue`
+      )
+        .then(mod => {
+          resolve(mod);
+        });
+    };
   }
 }
 
