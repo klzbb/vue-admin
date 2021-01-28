@@ -10,5 +10,6 @@ module.exports = {
       // https://panjiachen.github.io/vue-element-admin-site/guide/advanced/lazy-loading.html
       'plugins': ['dynamic-import-node']
     }
-  }
+  },
+  plugins: ['syntax-dynamic-import']
 };

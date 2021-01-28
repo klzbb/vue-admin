@@ -73,22 +73,14 @@ function filterAsyncRoutes(routes) {
 }
 
 function view(path, componentName) {
-  // return function(resolve) {
-  //   return require([`@/views${path}.vue`], resolve);
-  // };
-  // return r => require.ensure([], () => r(require(`@/views${path}.vue`)));
-  // return (resolve) => require([`@/views${path}`], resolve);
-
-  return function(resolve) {
-    import(
+  if (process.env.NODE_ENV === 'development') {
+    return (resolve) => require([`@/views${path}.vue`], resolve);
+  } else {
+    return (path) => import(
       /* webpackChunkName: "[request]" */
-      /* webpackIgnore: "false" */
-
       `@/views${path}.vue`
-    ).then(mod => {
-      resolve(mod);
-    });
-  };
+    );
+  }
 }
 
 router.afterEach(() => {
