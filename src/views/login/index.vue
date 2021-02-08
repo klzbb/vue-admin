@@ -11,7 +11,6 @@
       <div class="title-container">
         <h3 class="title">登录</h3>
       </div>
-      <img :src="codeImageUrl" class="login-container_code_image" alt="">
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
@@ -19,7 +18,7 @@
         <el-input
           ref="username"
           v-model="loginForm.username"
-          placeholder="Username"
+          placeholder="请输入账号"
           name="username"
           type="text"
           tabindex="1"
@@ -38,7 +37,7 @@
             ref="password"
             v-model="loginForm.password"
             :type="passwordType"
-            placeholder="Password"
+            placeholder="请输入密码"
             name="password"
             tabindex="2"
             autocomplete="on"
@@ -52,7 +51,17 @@
           </span>
         </el-form-item>
       </el-tooltip>
-
+      <el-form-item prop="imageCode">
+        <el-input
+          v-model="loginForm.imageCode"
+          placeholder="请输入验证码"
+          name="imageCode"
+          type="text"
+          tabindex="1"
+          clearable
+        />
+        <img :src="codeImageUrl" class="login-container_code_image" alt="" @click="refreshImageCode">
+      </el-form-item>
       <el-button
         :loading="loading"
         type="primary"
@@ -103,6 +112,7 @@ export default {
     return {
       codeImageUrl: '',
       loginForm: {
+        imageCode: '',
         username: '13622894595',
         password: '123444'
       },
@@ -148,6 +158,9 @@ export default {
   },
   methods: {
     async init() {
+      this.codeImage();
+    },
+    async codeImage() {
       const res = await codeImage();
       if (res && res.data.code === 0) {
         this.codeImageUrl = res.data.data;
@@ -155,6 +168,9 @@ export default {
     },
     home() {
       this.$router.push('/');
+    },
+    refreshImageCode() {
+      this.codeImage();
     },
     checkCapslock(e) {
       const { key } = e;
@@ -175,6 +191,7 @@ export default {
         if (valid) {
           this.loading = true;
           try {
+            console.log('loginForm=', this.loginForm);
             await this.$store.dispatch('user/login', this.loginForm);
             this.loading = false;
             this.$router.push('/sys/home');
@@ -316,7 +333,9 @@ $light_gray: #eee;
     right: 0;
     bottom: 6px;
   }
-
+  &_code_image{
+    cursor:pointer;
+  }
   @media only screen and (max-width: 470px) {
     .thirdparty-button {
       display: none;

@@ -54,7 +54,6 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   res => {
-    console.log({ res });
     const { code } = res.data;
     const condition = [0];
     if (condition.includes(code)) {

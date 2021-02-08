@@ -26,9 +26,9 @@ const actions = {
 
   // user login
   login({ commit }, userInfo) {
-    const { username, password } = userInfo;
+    const { username, password, imageCode } = userInfo;
     return new Promise((resolve, reject) => {
-      login({ username: username.trim(), password: password }).then(response => {
+      login({ username: username.trim(), password: password, imageCode }).then(response => {
         commit('SET_LOGIN_STATUS', '1');
         commit('SET_USER_INFO', response.data.data.user); // 保存用户数据
         resolve(response);
