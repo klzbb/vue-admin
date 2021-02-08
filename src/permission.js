@@ -37,7 +37,7 @@ router.beforeEach(async(to, from, next) => {
       if (permission_routes && permission_routes.length) {
         next();
       } else {
-        /**
+      /**
          * 生成动态路由
          */
         const res = await getPermissionMenusByUid();

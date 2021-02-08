@@ -62,6 +62,9 @@
         />
         <img :src="codeImageUrl" class="login-container_code_image" alt="" @click="refreshImageCode">
       </el-form-item>
+      <el-form-item prop="imageCode">
+        <el-checkbox v-model="loginForm.rememberMe" name="remembe-me">记住我</el-checkbox>
+      </el-form-item>
       <el-button
         :loading="loading"
         type="primary"
@@ -112,6 +115,7 @@ export default {
     return {
       codeImageUrl: '',
       loginForm: {
+        rememberMe: true,
         imageCode: '',
         username: '13622894595',
         password: '123444'
