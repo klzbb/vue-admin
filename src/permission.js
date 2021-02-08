@@ -59,7 +59,9 @@ function filterAsyncRoutes(routes) {
           route.component = () => import('@/layout/index.vue');
           break;
         default:
-          route.component = view(route.component);
+          route.component = view(route.component, route.componentName);
+          // router.addRoutes(accessRoutes);
+
           break;
       }
       if (route.children && route.children.length) {
@@ -70,8 +72,20 @@ function filterAsyncRoutes(routes) {
   });
 }
 
-function view(path) {
-  return (resolve) => require([`@/views${path}.vue`], resolve);
+function view(path, componentName) {
+  if (process.env.NODE_ENV === 'development') {
+    return (resolve) => require([`@/views${path}.vue`], resolve);
+  } else {
+    return function(resolve) {
+      import(
+        /* webpackChunkName: "[request]" */
+        `@/views${path}.vue`
+      )
+        .then(mod => {
+          resolve(mod);
+        });
+    };
+  }
 }
 
 router.afterEach(() => {

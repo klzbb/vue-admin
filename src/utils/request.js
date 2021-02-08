@@ -16,6 +16,9 @@ const service = axios.create({
   // baseURL: process.env.VUE_APP_SERVICE_URL // url = base url + request url
   // withCredentials: true, // send cookies when cross-domain requests
   // timeout: 20000 // request timeout
+  validateStatus: function(status) {
+    return status >= 200 && status < 400; // 默认的
+  }
 });
 
 // request interceptor
@@ -51,6 +54,7 @@ service.interceptors.response.use(
    * You can also judge the status by HTTP Status Code
    */
   res => {
+    console.log({ res });
     const { code } = res.data;
     const condition = [0];
     if (condition.includes(code)) {
@@ -74,7 +78,7 @@ service.interceptors.response.use(
     }
   },
   error => {
-    console.log('err=' + error); // for debug
+    console.log('err=', { error }); // for debug
     Message({
       message: error.message,
       type: 'error',

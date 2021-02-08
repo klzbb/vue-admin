@@ -4,7 +4,7 @@
       <div class="role_filter">
         <el-form :inline="true" :model="formInline" class="demo-form-inline">
           <el-form-item>
-            <el-button type="primary" @click="addDept">新增</el-button>
+            <el-button type="primary" @click="addDept">新增部门</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -329,7 +329,7 @@ export default {
   }
 
   // reset element-ui css
-  .el-cascader {
+        .el-cascader {
     display: block;
   }
 

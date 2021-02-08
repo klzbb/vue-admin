@@ -6,8 +6,11 @@ function resolve(dir) {
   return path.join(__dirname, dir);
 }
 
-const name = defaultSettings.title || 'vue Element Admin'; // page title
+// const CompressionWebpackPlugin = require('compression-webpack-plugin');
+const productionGzipExtensions = ['js', 'css'];
 
+const name = defaultSettings.title || 'vue Element Admin'; // page title
+// console.log(process.env);
 // If your port is set to 80,
 // use administrator privileges to execute the command line.
 // For example, Mac: sudo npm run
@@ -47,6 +50,7 @@ module.exports = {
     },
     before: require('./mock/mock-server.js')
   },
+
   configureWebpack: {
     // provide the app's title in webpack's name field, so that
     // it can be accessed in index.html to inject the correct title.
@@ -55,7 +59,12 @@ module.exports = {
       alias: {
         '@': resolve('src')
       }
+    },
+    output: {
+      // filename: '[name].bundle.js',
+      chunkFilename: './static/js/[name].[chunkhash].js'
     }
+
   },
   chainWebpack(config) {
     // it can improve the speed of the first screen, it is recommended to turn on preload
@@ -76,6 +85,7 @@ module.exports = {
       .rule('svg')
       .exclude.add(resolve('src/icons'))
       .end();
+
     config.module
       .rule('icons')
       .test(/\.svg$/)
@@ -125,10 +135,31 @@ module.exports = {
             });
           // https:// webpack.js.org/configuration/optimization/#optimizationruntimechunk
           config.optimization.runtimeChunk('single');
+          // gzip 压缩配置
+          config
+            .plugin('compression-webpack-plugin')
+            .use(require('compression-webpack-plugin'), [
+              {
+                algorithm: 'gzip',
+                test: /\.(js|css)$/, // 匹配文件名
+                threshold: 10240, // 对超过10k的数据压缩
+                deleteOriginalAssets: false, // 不删除源文件
+                minRatio: 0.8 // 压缩比
+              }
+            ]);
+        }
+      )
+      .when(process.env.VUE_APP_BUILD_FLAG === 'anal',
+        config => {
+          config
+            .plugin('bundle-analyzer')
+            .use(require('webpack-bundle-analyzer').BundleAnalyzerPlugin, [
+              {
+                analyzerPort: 8080,
+                generateStatsFile: false
+              }
+            ]);
         }
       );
-  },
-  css: {
-    extract: false
   }
 };
