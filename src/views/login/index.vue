@@ -11,7 +11,7 @@
       <div class="title-container">
         <h3 class="title">登录</h3>
       </div>
-
+      <img :src="codeImageUrl" class="login-container_code_image" alt="">
       <el-form-item prop="username">
         <span class="svg-container">
           <svg-icon icon-class="user" />
@@ -78,6 +78,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate';
+import { codeImage } from '@/api/index.js';
 import SocialSign from './components/SocialSignin';
 import router from '@/router';
 export default {
@@ -100,6 +101,7 @@ export default {
       }
     };
     return {
+      codeImageUrl: '',
       loginForm: {
         username: '13622894595',
         password: '123444'
@@ -132,20 +134,25 @@ export default {
       immediate: true
     }
   },
-  created() {
-    // window.addEventListener('storage', this.afterQRScan)
-  },
+
   mounted() {
     if (this.loginForm.username === '') {
       this.$refs.username.focus();
     } else if (this.loginForm.password === '') {
       this.$refs.password.focus();
     }
+    this.init();
   },
   destroyed() {
     // window.removeEventListener('storage', this.afterQRScan)
   },
   methods: {
+    async init() {
+      const res = await codeImage();
+      if (res && res.data.code === 0) {
+        this.codeImageUrl = res.data.data;
+      }
+    },
     home() {
       this.$router.push('/');
     },

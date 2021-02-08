@@ -181,3 +181,9 @@ export const getPermissionMenusByUid = () => axios({
   url: '/app/menu/getPermissionMenusByUid',
   method: 'post'
 });
+
+// 图形验证码
+export const codeImage = () => axios({
+  url: '/app/code/image',
+  method: 'get'
+});
