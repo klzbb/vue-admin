@@ -20,7 +20,7 @@
     "fix": "eslint --ignore-pattern 'node_modules/*'  --fix **/*.js **/*.vue"
   },
   "dependencies": {
-    "axios": "0.18.1",
+    "axios": "1.6.0",
     "clipboard": "2.0.4",
     "codemirror": "5.45.0",
     "core-js": "3.6.5",
